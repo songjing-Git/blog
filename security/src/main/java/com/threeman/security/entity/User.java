@@ -45,8 +45,26 @@ public class User implements Serializable, UserDetails {
     @TableField("password")
     private String password;
 
+    /**
+     * 邮箱
+     */
+    @TableField("email")
+    private String email;
+
+    /**
+     * 年龄
+     */
+    @TableField("age")
+    private String age;
+
+    /**
+     * 角色
+     */
     private List<Role> roles;
 
+    /**
+     * 权限
+     */
     private List<GrantedAuthority> grantedAuthorities;
 
     @Override
