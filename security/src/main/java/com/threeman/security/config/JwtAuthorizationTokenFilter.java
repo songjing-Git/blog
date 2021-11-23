@@ -1,6 +1,7 @@
 package com.threeman.security.config;
 
 import com.auth0.jwt.interfaces.Claim;
+import com.three.common.result.Result;
 import com.three.common.utils.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,13 +29,17 @@ public class JwtAuthorizationTokenFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         String tokenHeader = request.getHeader("token");
-        logger.info("=====tokenHeader:"+tokenHeader);
-        SecurityContextHolder.getContext().setAuthentication(getAuthentication(tokenHeader));
-        logger.info("======doFilterInternal");
+        if (!JwtUtil.isJwtExpire(tokenHeader)){
+            SecurityContextHolder.getContext().setAuthentication(getAuthentication(tokenHeader));
+        }else {
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write(new Result<>(1990,"token失效").toString());
+            return;
+        }
         chain.doFilter(request, response);
     }
 
-    // 这里从token中获取用户信息并新建一个token
+    // 这里从token中获取用户信息
     private UsernamePasswordAuthenticationToken getAuthentication(String token) {
         Map<String, Claim> payload = JwtUtil.getPayload(token);
         String username = payload.get("username").asString();

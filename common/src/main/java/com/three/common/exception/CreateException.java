@@ -7,12 +7,20 @@ package com.three.common.exception;
  */
 public  class CreateException extends RuntimeException{
 
-    private final Integer code;
-    private final String message;
+    private  Integer code;
+    private  String message;
 
     public CreateException(Integer code,String message){
         this.code=code;
         this.message=message;
+    }
+
+    public CreateException(String message){
+        this.message=message;
+    }
+
+    public CreateException(Integer code){
+        this.code=code;
     }
 
     public Integer getCode() {

@@ -52,7 +52,7 @@ public class ResponseAdvice implements ResponseBodyAdvice<Object> {
             return body;
         }
         if (body instanceof CreateException){
-            return body;
+            return new Result<>(ResultEnum.DEFAULT_FAILED, ((CreateException) body).getMessage());
         }
         if (body instanceof String){
             ObjectMapper om = new ObjectMapper();

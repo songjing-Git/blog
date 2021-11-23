@@ -81,10 +81,9 @@ public class JwtUtil {
      */
     public static boolean isJwtExpire(String jwtToken) {
         Map<String, Claim> payload = getPayload(jwtToken);
-        log.info("payload:{}",payload);
         if (payload!=null&&!payload.isEmpty()){
             Date exp = payload.get("exp").asDate();
-            if (exp.after(new Date())){
+            if (exp.before(new Date())){
                 return true;
             }
             return false;

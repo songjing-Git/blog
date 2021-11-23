@@ -1,12 +1,11 @@
 package com.threeman.security.testController;
 
-import com.auth0.jwt.interfaces.Claim;
-import com.three.common.utils.JwtUtil;
+import com.threeman.security.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 /**
  * @author songjing
@@ -17,8 +16,15 @@ import java.util.Map;
 @RestController
 public class Controller {
 
+
+    @Autowired
+    UserMapper userMapper;
+
     @GetMapping("/userAdd")
+    @Transactional
     public String test(){
+        userMapper.findUserInfoById(1);
+        userMapper.findUserInfoById(1);
         return "userAdd";
     }
 }

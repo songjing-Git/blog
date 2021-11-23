@@ -1,6 +1,8 @@
 package com.threeman.security.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,7 +27,7 @@ public class UserRole implements Serializable {
     /**
      * id
      */
-    @TableField("user_role_id")
+    @TableId(type= IdType.AUTO)
     private Long userRoleId;
 
     /**

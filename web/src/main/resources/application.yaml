@@ -3,3 +3,8 @@ server:
 spring:
     application:
         name: blog
+mybatis-plus:
+    configuration:
+        #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启sql日志
+        local-cache-scope: session
+        cache-enabled: true
