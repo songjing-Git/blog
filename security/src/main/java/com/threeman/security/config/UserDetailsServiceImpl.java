@@ -1,6 +1,6 @@
 package com.threeman.security.config;
 
-import com.three.common.exception.CreateException;
+import com.threeman.common.exception.CreateException;
 import com.threeman.security.entity.*;
 import com.threeman.security.mapper.*;
 import lombok.extern.slf4j.Slf4j;

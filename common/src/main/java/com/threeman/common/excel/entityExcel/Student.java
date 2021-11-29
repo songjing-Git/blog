@@ -1,4 +1,4 @@
-package com.three.common.excel.entityExcel;
+package com.threeman.common.excel.entityExcel;
 
 import lombok.Data;
 

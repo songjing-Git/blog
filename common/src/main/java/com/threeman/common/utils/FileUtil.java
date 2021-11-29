@@ -1,12 +1,12 @@
-package com.three.common.utils;
+package com.threeman.common.utils;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.read.builder.ExcelReaderBuilder;
 import com.alibaba.excel.read.builder.ExcelReaderSheetBuilder;
 import com.alibaba.excel.write.builder.ExcelWriterBuilder;
 import com.alibaba.excel.write.builder.ExcelWriterSheetBuilder;
-import com.three.common.excel.listener.Listener;
-import com.three.common.exception.CreateException;
+import com.threeman.common.excel.listener.Listener;
+import com.threeman.common.exception.CreateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -68,6 +68,13 @@ public class FileUtil {
     public static List<Object> fileSyncToObject(MultipartFile multipartFile, Class clazz){
         File file = FileUtil.multipartFileToFile(multipartFile);
         ExcelReaderBuilder read = EasyExcel.read(file, clazz, new Listener<>());
+        ExcelReaderSheetBuilder sheet = read.sheet();
+        return sheet.doReadSync();
+    }
+
+    public static List<Object> fileSync(MultipartFile multipartFile){
+        File file = FileUtil.multipartFileToFile(multipartFile);
+        ExcelReaderBuilder read = EasyExcel.read(file, new Listener<>());
         ExcelReaderSheetBuilder sheet = read.sheet();
         return sheet.doReadSync();
     }

@@ -1,9 +1,9 @@
 package com.threeman.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.three.common.result.Result;
-import com.three.common.result.ResultEnum;
-import com.three.common.utils.JwtUtil;
+import com.threeman.common.result.Result;
+import com.threeman.common.result.ResultEnum;
+import com.threeman.common.utils.JwtUtil;
 import com.threeman.security.entity.User;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

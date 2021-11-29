@@ -11,6 +11,7 @@
     <modules>
         <module>api</module>
         <module>service-core</module>
+        <module>common</module>
         <module>security</module>
         <module>web</module>
     </modules>
@@ -57,11 +58,11 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>3.4.2</version>
         </dependency>
-        <dependency>
-            <groupId>p6spy</groupId>
-            <artifactId>p6spy</artifactId>
-            <version>3.8.2</version>
-        </dependency>
+        <!--<dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>1.2.6</version>
+        </dependency>-->
     </dependencies>
 
     <dependencyManagement>
@@ -69,7 +70,19 @@
 
         </dependencies>
     </dependencyManagement>
+    <distributionManagement>
+        <repository>
+            <id>maven-release</id>
+            <name>maven-release</name>
+            <url>http://121.41.59.128:8081/repository/maven-release/</url>
+        </repository>
 
+        <snapshotRepository>
+            <id>maven-snapshots</id>
+            <name>maven-snapshots</name>
+            <url>http://121.41.59.128:8081/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
     <build>
         <plugins>
             <plugin>
