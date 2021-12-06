@@ -1,6 +1,7 @@
 package com.threeman.security.config;
 
 import com.auth0.jwt.interfaces.Claim;
+import com.threeman.common.exception.CreateException;
 import com.threeman.common.result.Result;
 import com.threeman.common.result.ResultEnum;
 import com.threeman.common.utils.JwtUtil;
@@ -9,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -29,7 +31,11 @@ public class JwtAuthorizationTokenFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+        logger.info("doFilterInternal");
         String token = request.getHeader("token");
+        if (StringUtils.isEmpty(token)){
+            throw new CreateException("认证失败，jwt不能为空");
+        }
         if (!JwtUtil.isJwtExpire(token)){
             SecurityContextHolder.getContext().setAuthentication(getAuthentication(token));
         }else {
@@ -43,6 +49,7 @@ public class JwtAuthorizationTokenFilter extends BasicAuthenticationFilter {
      * 这里从token中获取用户信息
      */
     private UsernamePasswordAuthenticationToken getAuthentication(String token) {
+        logger.info("UsernamePasswordAuthenticationToken");
         Map<String, Claim> payload = JwtUtil.getPayload(token);
         String username = payload.get("username").asString();
         if (username != null) {

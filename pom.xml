@@ -70,6 +70,7 @@
 
         </dependencies>
     </dependencyManagement>
+    <!--私库配置-->
     <distributionManagement>
         <repository>
             <id>maven-release</id>

@@ -137,10 +137,11 @@ public class FileUtil {
      * 删除本地临时文件
      * @param file
      */
-    public static void deleteTempFile(File file) {
+    public static boolean deleteTempFile(File file) {
         if (file != null) {
             File del = new File(file.toURI());
-            del.delete();
+            return del.delete();
         }
+        return false;
     }
 }

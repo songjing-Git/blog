@@ -34,8 +34,8 @@ spring:
 #            connect-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
 
     redis:
-#        host: 121.41.59.128
-#        port: 6381
+        host: localhost
+        port: 6379
         database: 0
         # 连接超时时间（毫秒）
         timeout: 1000
@@ -49,7 +49,7 @@ spring:
                 max-idle: 10
                 # 连接池中的最小空闲连接
                 min-idle: 0
-        sentinel:
-            master: mymaster
-            nodes: 121.41.59.128:6382,121.41.59.128:6383,121.41.59.128:6384
+#        sentinel:
+#            master: mymaster
+#            nodes: 121.41.59.128:6382,121.41.59.128:6383,121.41.59.128:6384
 

@@ -10,11 +10,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,39 +40,38 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     AuthorityMapper authorityMapper;
 
-    @Resource
-    private PasswordEncoder passwordEncoder;
-
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         if (StringUtils.isEmpty(s)){
             throw  new CreateException(202,"用户名不能为空");
         }
         User userInfo = userMapper.findUserInfoByName(s);
-        log.info("userInfo:{}",userInfo);
         if (userInfo==null){
-            throw new UsernameNotFoundException("用户名不存在");
+            throw new CreateException("用户不存在");
         }
+        //获取用户userId
         Long userId = userInfo.getUserId();
+        //根据userId获取用户角色关联信息
         List<UserRole> userRoleInfos = userRoleMapper.getUserRoleInfosByUserId(userId);
+        //用于登录用户角色存储
         List<Role> roles=new ArrayList<>();
-        userInfo.setRoles(roles);
+        //用于登录用户权限信息存储
         List<GrantedAuthority> grantedAuthorities=new ArrayList<>();
+        //遍历对应关系获取权限信息
         for (UserRole userRole : userRoleInfos){
             Role role = roleMapper.getRoleInfoByRoleId(userRole.getRoleId());
             List<RoleAuthority> roleAuthorityInfos = roleAuthorityMapper.getRoleAuthorityInfosByRoleId(userRole.getRoleId());
             for (RoleAuthority roleAuthority: roleAuthorityInfos){
                 Long authorityId = roleAuthority.getAuthorityId();
-                log.info("authorityId:{}",authorityId);
                 Authority authorityInfo = authorityMapper.getAuthorityInfoByAuthorityId(authorityId);
                 grantedAuthorities.add(new SimpleGrantedAuthority(authorityInfo.getAuthorityName()));
             }
             roles.add(role);
         }
-        userInfo.setGrantedAuthorities(grantedAuthorities);
+        //将角色存储在User中
         userInfo.setRoles(roles);
-        log.info("matches:{}",passwordEncoder.matches("songjing",userInfo.getPassword()));
-        log.info("userInfo:{}",userInfo);
-            return userInfo;
+        //将权限信息存储在User中
+        userInfo.setGrantedAuthorities(grantedAuthorities);
+        return userInfo;
     }
 }

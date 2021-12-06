@@ -3,10 +3,10 @@ server:
 spring:
     application:
         name: blog-core
-    cloud:
-        nacos:
-            discovery:
-                server-addr: 114.132.227.186:8848
+#    cloud:
+#        nacos:
+#            discovery:
+#                server-addr: 114.132.227.186:8848
 mybatis-plus:
     configuration:
         #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启sql日志
