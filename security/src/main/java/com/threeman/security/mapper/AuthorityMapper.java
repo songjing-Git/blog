@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * 权限表(Authority)表服务接口
  *
@@ -30,5 +32,5 @@ public interface AuthorityMapper extends BaseMapper<Authority> {
      * @return
      */
     @Select("select * from authority ")
-    Authority getAuthorityInfo();
+    List<Authority> getAuthorityInfo();
 }

@@ -22,6 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author songjing
@@ -51,14 +52,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        Authority authorityInfo = authorityMapper.getAuthorityInfo();
-        if (authorityInfo==null){
+        List<Authority> authorityInfos = authorityMapper.getAuthorityInfo();
+        if (authorityInfos.isEmpty()){
             throw  new CreateException(402,"获取权限信息失败");
         }
         http.formLogin().loginProcessingUrl("/login");
         http.logout().permitAll();
-        http.authorizeRequests().antMatchers(authorityInfo.getAuthorityUrl()).hasAnyAuthority(authorityInfo.getAuthorityName());
-
+        for (Authority authorityInfo:authorityInfos){
+            http.authorizeRequests().antMatchers(authorityInfo.getAuthorityUrl()).hasAnyAuthority(authorityInfo.getAuthorityName());
+        }
         http.addFilter(new JwtAuthenticationFilter(authenticationManager()));
         http.addFilter(new JwtAuthorizationTokenFilter(authenticationManager()));
         http.csrf().disable();
