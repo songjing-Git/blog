@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         logger.info("进入JwtAuthenticationFilter的attemptAuthentication方法");
-        log.info("request.getInputStream():{}",request);
+        assert !request.getInputStream().isFinished();
         User userInfo = new ObjectMapper().readValue(request.getInputStream(), User.class);
         return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userInfo.getUsername(),userInfo.getPassword()));
     }
