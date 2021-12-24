@@ -34,7 +34,7 @@ public class MySuccessHandle implements AuthenticationSuccessHandler {
             strings.add(authority.getAuthority());
         }
         User user  =(User) authentication.getPrincipal();
-        String jwtToken = JwtUtil.getJwtToken(user.getUserId().toString(),user.getUsername(), strings);
+        String jwtToken = JwtUtil.getJwtToken(user.getUserId().toString(),user.getUsername(),user.getPassword(), strings);
         response.setHeader("token",jwtToken);
         response.setContentType("text/html;charset=utf-8");
         response.getWriter().write(new Result<>(ResultEnum.DEFAULT_SUCCESS).toString());

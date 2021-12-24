@@ -30,7 +30,7 @@ public class JwtUtil {
     private final static long OUT_TIME =60*60*1000;
 
 
-    public static String getJwtToken(String userId, String username , List<String> authorities){
+    public static String getJwtToken(String userId, String username ,String password, List<String> authorities){
         Map<String, Object> map = new HashMap<>(16);
         map.put("alg", "HS256");
         map.put("typ", "JWT");
@@ -48,6 +48,7 @@ public class JwtUtil {
                 //载荷
                 .withClaim("authority", authorities)
                 .withClaim("username",username)
+                .withClaim("password",password)
                 //标识JWT所颁发的时间
                 .withIssuedAt(date)
                 //标识了时间点，当早于这个时间点，JWT不会被接受和处理

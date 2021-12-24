@@ -5,9 +5,6 @@ import com.threeman.common.exception.CreateException;
 import com.threeman.common.result.Result;
 import com.threeman.common.result.ResultEnum;
 import com.threeman.common.utils.JwtUtil;
-import com.threeman.security.entity.User;
-import com.threeman.security.mapper.UserMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -29,10 +26,9 @@ import java.util.Map;
  * @version 1.0
  * @date 2021/11/12 9:49
  */
+
 public class JwtAuthorizationTokenFilter extends BasicAuthenticationFilter {
 
-    @Autowired
-    UserMapper userMapper;
 
     public JwtAuthorizationTokenFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
@@ -64,23 +60,27 @@ public class JwtAuthorizationTokenFilter extends BasicAuthenticationFilter {
         logger.info("UsernamePasswordAuthenticationToken");
         Map<String, Claim> payload = JwtUtil.getPayload(token);
         String username = payload.get("username").asString();
+        logger.info("username:"+username);
         if (StringUtils.isEmpty(username)){
             throw new CreateException("username获取异常");
         }
-        User userInfo = userMapper.findUserInfoByName(username);
-        Claim authority = payload.get("authority");
-        String s = authority.asString();
-        if (StringUtils.isEmpty(s)){
+        String password = payload.get("password").asString();
+        if (StringUtils.isEmpty(password)){
             throw new CreateException("token获取异常");
         }
-        String[] split = s.replace("[", "").replace("]", "").split(",");
-        if (split.length == 0){
+        Claim authority = payload.get("authority");
+        if (authority.isNull()){
+            throw new CreateException("token权限获取异常");
+        }
+        List<String> s = authority.asList(String.class);
+        logger.info(s);
+        if (s.isEmpty()){
             throw new CreateException("token解析异常");
         }
         List<SimpleGrantedAuthority> simpleGrantedAuthorities = new ArrayList<>();
-        for (String s1:split){
+        for (String s1:s){
             simpleGrantedAuthorities.add(new SimpleGrantedAuthority(s1));
         }
-        return new UsernamePasswordAuthenticationToken(username,userInfo.getPassword(),simpleGrantedAuthorities);
+        return new UsernamePasswordAuthenticationToken(username,password,simpleGrantedAuthorities);
     }
 }
