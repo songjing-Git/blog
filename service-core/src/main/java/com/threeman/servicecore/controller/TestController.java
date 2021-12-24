@@ -33,6 +33,8 @@ public class TestController {
     @GetMapping("/userAdd")
     @Transactional
     public Object userAdd(){
-        return "ok";
+        String s = String.valueOf(345);
+        String replace = s.replace("3", "6");
+        return replace.trim();
     }
 }

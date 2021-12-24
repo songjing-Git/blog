@@ -49,6 +49,11 @@ public class ArrayAlgorithm {
         return resultArray;
     }
 
+    /**
+     * 稀疏数组转为一般数组
+     * @param arraySparse 稀疏数组
+     * @return 一般数组
+     */
     public static int[][] arraySparse( int[][]  arraySparse){
         if (arraySparse==null||arraySparse.length==0){
             return arraySparse;

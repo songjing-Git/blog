@@ -9,10 +9,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.header.Header;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.stereotype.Component;
@@ -21,6 +23,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.annotation.Resource;
+import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,7 +46,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     @Resource
+    DataSource dataSource;
+
+    @Resource
     private PasswordEncoder passwordEncoder;
+
+    @Resource
+    MySuccessHandle mySuccessHandle;
+
+    @Resource
+    MyFailureHandle myFailureHandle;
+
+    @Bean
+    PersistentTokenRepository persistentTokenRepository(){
+        JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
+        jdbcTokenRepository.setDataSource(dataSource);
+        return jdbcTokenRepository;
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -56,12 +75,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         if (authorityInfos.isEmpty()){
             throw  new CreateException(402,"获取权限信息失败");
         }
-        http.formLogin().loginProcessingUrl("/login");
+        http.authorizeRequests().antMatchers("/login").permitAll();
+        http.authorizeRequests().antMatchers("/favicon.ico").permitAll();
+        http.formLogin().loginProcessingUrl("/login")
+        .successHandler(mySuccessHandle)
+        .failureHandler(myFailureHandle);
+        http.rememberMe()
+                .tokenValiditySeconds(3600)
+                .tokenRepository(persistentTokenRepository());
         http.logout().permitAll();
         for (Authority authorityInfo:authorityInfos){
             http.authorizeRequests().antMatchers(authorityInfo.getAuthorityUrl()).hasAnyAuthority(authorityInfo.getAuthorityName());
         }
-        http.addFilter(new JwtAuthenticationFilter(authenticationManager()));
+        //http.addFilter(new JwtAuthenticationFilter(authenticationManager()));
         http.addFilter(new JwtAuthorizationTokenFilter(authenticationManager()));
         http.csrf().disable();
         http.cors();
@@ -70,7 +96,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 new Header("Access-control-Allow-Origin","*"),
                 //使ajax请求能够取到header中的jwt token信息
                 new Header("Access-Control-Expose-Headers","Authorization"))));
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Bean
@@ -86,34 +111,34 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
-//    @Override
-//    public void configure(WebSecurity web)  {
-//        web.ignoring().antMatchers("/index.html", "/static/**","/favicon.ico")
-//                // 给 swagger 放行 不需要权限能访问的资源
-//                .antMatchers("/swagger-ui.html","/doc.html",
-//                        "/swagger-resources/**",
-//                        "/images/**",
-//                        "/webjars/**",
-//                        "/v2/api-docs",
-//                        "/configuration/ui",
-//                        "/configuration/security",
-//                        "/swagger-resources/configuration/security",
-//                        "/swagger-resources/configuration/ui",
-//                        "/swagger-resources");
-//
-//
-//        web.ignoring()
-//                .antMatchers(
-//                        "swagger-ui.html",
-//                        "**/swagger-ui.html",
-//                        "/favicon.ico",
-//                        "/**/*.css",
-//                        "/**/*.js",
-//                        "/**/*.png",
-//                        "/**/*.gif",
-//                        "/swagger-resources/**",
-//                        "/v2/**",
-//                        "/**/*.ttf"
-//                );
-//    }
+    @Override
+    public void configure(WebSecurity web)  {
+        web.ignoring().antMatchers("/index.html", "/static/**","/favicon.ico")
+                // 给 swagger 放行 不需要权限能访问的资源
+                .antMatchers("/swagger-ui.html","/doc.html",
+                        "/swagger-resources/**",
+                        "/images/**",
+                        "/webjars/**",
+                        "/v2/api-docs",
+                        "/configuration/ui",
+                        "/configuration/security",
+                        "/swagger-resources/configuration/security",
+                        "/swagger-resources/configuration/ui",
+                        "/swagger-resources");
+
+
+        web.ignoring()
+                .antMatchers(
+                        "swagger-ui.html",
+                        "**/swagger-ui.html",
+                        "/favicon.ico",
+                        "/**/*.css",
+                        "/**/*.js",
+                        "/**/*.png",
+                        "/**/*.gif",
+                        "/swagger-resources/**",
+                        "/v2/**",
+                        "/**/*.ttf"
+                );
+    }
 }

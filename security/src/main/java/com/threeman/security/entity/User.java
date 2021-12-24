@@ -64,6 +64,7 @@ public class User implements Serializable, UserDetails {
      */
     private List<Role> roles;
 
+    private String rememberMe;
     /**
      * 权限
      */

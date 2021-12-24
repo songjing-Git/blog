@@ -16,11 +16,16 @@ public class NoPasswordEncoder  implements PasswordEncoder {
 
     @Override
     public String encode(CharSequence charSequence) {
+        log.info("charSequence"+charSequence);
         return charSequence.toString();
     }
 
     @Override
     public boolean matches(CharSequence charSequence, String s) {
-        return true;
+        log.info("密码是否匹配:{}",charSequence.equals(s));
+        if (charSequence.equals(s)){
+            return true;
+        }
+        return false;
     }
 }

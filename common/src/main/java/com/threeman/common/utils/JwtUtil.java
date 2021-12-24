@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,7 +30,7 @@ public class JwtUtil {
     private final static long OUT_TIME =60*60*1000;
 
 
-    public static String getJwtToken(String userId,String username ,String authorities){
+    public static String getJwtToken(String userId, String username , List<String> authorities){
         Map<String, Object> map = new HashMap<>(16);
         map.put("alg", "HS256");
         map.put("typ", "JWT");
@@ -45,7 +46,7 @@ public class JwtUtil {
                 //关于subject的陈述
                 .withSubject(username)
                 //载荷
-                .withClaim("authority",authorities)
+                .withClaim("authority", authorities)
                 .withClaim("username",username)
                 //标识JWT所颁发的时间
                 .withIssuedAt(date)
