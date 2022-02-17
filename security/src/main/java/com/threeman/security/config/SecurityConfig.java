@@ -13,8 +13,10 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.security.web.header.Header;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.stereotype.Component;
@@ -64,6 +66,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return jdbcTokenRepository;
     }
 
+    @Bean
+    public RememberMeServices rememberMeServices() {
+        MyPersistentTokenBasedRememberMeServices rememberMeServices = new MyPersistentTokenBasedRememberMeServices("INTERNAL_SECRET_KEY", new UserDetailsServiceImpl(), persistentTokenRepository());
+        // 修改默认参数remember-me为rememberMe和前端请求中的key要一致
+        rememberMeServices.setParameter("remember_value");
+        //token有效期7天
+        rememberMeServices.setTokenValiditySeconds(3600 * 24 * 7);
+        return rememberMeServices;
+    }
+    @Bean
+    public RememberMeAuthenticationFilter rememberMeAuthenticationFilter() throws Exception {
+        //重用WebSecurityConfigurerAdapter配置的AuthenticationManager，不然要自己组装AuthenticationManager
+        return new RememberMeAuthenticationFilter(authenticationManager(), rememberMeServices());
+    }
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
@@ -81,13 +97,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .successHandler(mySuccessHandle)
         .failureHandler(myFailureHandle);
         http.rememberMe()
+                .rememberMeParameter("remember_value")
+                .rememberMeCookieName("isRemember")
                 .tokenValiditySeconds(3600)
                 .tokenRepository(persistentTokenRepository());
         http.logout().permitAll();
         for (Authority authorityInfo:authorityInfos){
-            http.authorizeRequests().antMatchers(authorityInfo.getAuthorityUrl()).hasAnyAuthority(authorityInfo.getAuthorityName());
+            http.authorizeRequests().antMatchers(authorityInfo.getAuthorityUrl()).hasAnyAuthority(authorityInfo.getAuthorityCode());
         }
         //http.addFilter(new JwtAuthenticationFilter(authenticationManager()));
+        MyAuthenticationFilter myAuthenticationFilter = new MyAuthenticationFilter();
+        myAuthenticationFilter.setAuthenticationManager(super.authenticationManager());
+        myAuthenticationFilter.setAuthenticationSuccessHandler(mySuccessHandle);
+        myAuthenticationFilter.setAuthenticationFailureHandler(myFailureHandle);
+        myAuthenticationFilter.setRememberMeServices(rememberMeServices());
+        http.addFilter(myAuthenticationFilter);
         http.addFilter(new JwtAuthorizationTokenFilter(authenticationManager()));
         http.csrf().disable();
         http.cors();
@@ -101,10 +125,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     protected CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(Arrays.asList("*"));
-//        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.addAllowedOrigin("*");
+        configuration.addAllowedHeader("*");
         configuration.setAllowedMethods(Arrays.asList("GET","POST","HEAD", "OPTION"));
         configuration.addExposedHeader("Authorization");
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
@@ -114,6 +139,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web)  {
         web.ignoring().antMatchers("/index.html", "/static/**","/favicon.ico")
+                .antMatchers("/register","/verifiesUser","/sendVerifiesCode/*","/updatePassword")
                 // 给 swagger 放行 不需要权限能访问的资源
                 .antMatchers("/swagger-ui.html","/doc.html",
                         "/swagger-resources/**",

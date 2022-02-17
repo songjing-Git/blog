@@ -26,7 +26,7 @@ import java.util.List;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    UserMapper userMapper;
+    LoginMapper loginMapper;
 
     @Autowired
     UserRoleMapper userRoleMapper;
@@ -45,12 +45,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (StringUtils.isEmpty(s)){
             throw  new CreateException(202,"用户名不能为空");
         }
-        User userInfo = userMapper.findUserInfoByName(s);
-        if (userInfo==null){
+        Login loginInfo = loginMapper.findUserInfoByName(s);
+        if (loginInfo==null){
             throw new CreateException("用户不存在");
         }
         //获取用户userId
-        Long userId = userInfo.getUserId();
+        Long userId = loginInfo.getUserId();
         //根据userId获取用户角色关联信息
         List<UserRole> userRoleInfos = userRoleMapper.getUserRoleInfosByUserId(userId);
         //用于登录用户角色存储
@@ -64,14 +64,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             for (RoleAuthority roleAuthority: roleAuthorityInfos){
                 Long authorityId = roleAuthority.getAuthorityId();
                 Authority authorityInfo = authorityMapper.getAuthorityInfoByAuthorityId(authorityId);
-                grantedAuthorities.add(new SimpleGrantedAuthority(authorityInfo.getAuthorityName()));
+                grantedAuthorities.add(new SimpleGrantedAuthority(authorityInfo.getAuthorityCode()));
             }
             roles.add(role);
         }
         //将角色存储在User中
-        userInfo.setRoles(roles);
+        loginInfo.setRoles(roles);
         //将权限信息存储在User中
-        userInfo.setGrantedAuthorities(grantedAuthorities);
-        return userInfo;
+        loginInfo.setGrantedAuthorities(grantedAuthorities);
+        return loginInfo;
     }
 }

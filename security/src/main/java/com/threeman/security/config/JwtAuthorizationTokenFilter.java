@@ -39,6 +39,8 @@ public class JwtAuthorizationTokenFilter extends BasicAuthenticationFilter {
         logger.info("doFilterInternal");
         logger.info(request.getMethod());
         logger.info(request.getRequestURI());
+        logger.info(request.getAuthType());
+        logger.info(request.getContextPath());
         String token = request.getHeader("token");
         if (StringUtils.isEmpty(token)){
             throw new CreateException("认证失败，jwt不能为空");

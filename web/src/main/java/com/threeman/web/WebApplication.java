@@ -11,7 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @author 宋京
  */
 @ComponentScan("com.threeman")
-@MapperScan("com.threeman.*")
+@MapperScan("com.threeman.**.mapper")
 @ConfigurationPropertiesScan("com.threeman.common")
 @SpringBootApplication
 @EnableCaching

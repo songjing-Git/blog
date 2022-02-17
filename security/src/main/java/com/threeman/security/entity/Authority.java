@@ -43,5 +43,11 @@ public class Authority implements Serializable {
     @TableField("authority_url")
     private String authorityUrl;
 
+    /**
+     * 权限编码
+     */
+    @TableField("authority_code")
+    private String authorityCode;
+
 
 }

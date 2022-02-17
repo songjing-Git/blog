@@ -6,6 +6,8 @@ import org.apache.ibatis.cache.Cache;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.util.concurrent.locks.ReadWriteLock;
+
 
 /**
  * @author songjing
@@ -60,5 +62,10 @@ public class RedisCache implements Cache {
     @Override
     public int getSize() {
         return 0;
+    }
+
+    @Override
+    public ReadWriteLock getReadWriteLock() {
+        return null;
     }
 }

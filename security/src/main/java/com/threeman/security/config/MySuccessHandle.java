@@ -3,7 +3,7 @@ package com.threeman.security.config;
 import com.threeman.common.result.Result;
 import com.threeman.common.result.ResultEnum;
 import com.threeman.common.utils.JwtUtil;
-import com.threeman.security.entity.User;
+import com.threeman.security.entity.Login;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 /**
  * @author songjing
  * @version 1.0
@@ -33,8 +32,9 @@ public class MySuccessHandle implements AuthenticationSuccessHandler {
         for (GrantedAuthority authority:authorities){
             strings.add(authority.getAuthority());
         }
-        User user  =(User) authentication.getPrincipal();
-        String jwtToken = JwtUtil.getJwtToken(user.getUserId().toString(),user.getUsername(),user.getPassword(), strings);
+
+        Login login  =(Login) authentication.getPrincipal();
+        String jwtToken = JwtUtil.getJwtToken(login.getUserId().toString(),login.getUsername(),login.getPassword(), strings);
         response.setHeader("token",jwtToken);
         response.setContentType("text/html;charset=utf-8");
         response.getWriter().write(new Result<>(ResultEnum.DEFAULT_SUCCESS).toString());
