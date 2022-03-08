@@ -119,15 +119,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //支持所有源的访问
                 new Header("Access-control-Allow-Origin","*"),
                 //使ajax请求能够取到header中的jwt token信息
-                new Header("Access-Control-Expose-Headers","Authorization"))));
+                new Header("Access-Control-Expose-Headers","token"))));
     }
 
     @Bean
     protected CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*");
+        configuration.addAllowedOrigin("121.41.59.128");
         configuration.addAllowedHeader("*");
-        configuration.setAllowedMethods(Arrays.asList("GET","POST","HEAD", "OPTION"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT", "DELETE",
+                "HEAD","CONNECT","TRACE","OPTIONS"));
         configuration.addExposedHeader("Authorization");
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -136,10 +137,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
+
+
     @Override
     public void configure(WebSecurity web)  {
         web.ignoring().antMatchers("/index.html", "/static/**","/favicon.ico")
-                .antMatchers("/register","/verifiesUser","/sendVerifiesCode/*","/updatePassword")
+                .antMatchers("/register","/verifiesUser","/sendVerifiesCode/*","/updatePassword","/addUserRole","/findLabels/*","/insertBlog","/getBlogInfos")
                 // 给 swagger 放行 不需要权限能访问的资源
                 .antMatchers("/swagger-ui.html","/doc.html",
                         "/swagger-resources/**",

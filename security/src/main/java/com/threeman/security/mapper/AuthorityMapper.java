@@ -21,15 +21,15 @@ public interface AuthorityMapper extends BaseMapper<Authority> {
 
     /**
      * 根据authorityId获取权限资源信息
-     * @param authorityId
-     * @return
+     * @param authorityId 资源id
+     * @return Authority
      */
     @Select("select * from authority where authority_id = #{authorityId}")
     Authority getAuthorityInfoByAuthorityId(@Param("authorityId")long authorityId);
 
     /**
      * 获取权限对应资源信息
-     * @return
+     * @return List<Authority>
      */
     @Select("select * from authority ")
     List<Authority> getAuthorityInfo();

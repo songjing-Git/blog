@@ -42,6 +42,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+
         if (StringUtils.isEmpty(s)){
             throw  new CreateException(202,"用户名不能为空");
         }

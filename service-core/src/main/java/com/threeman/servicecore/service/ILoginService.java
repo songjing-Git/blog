@@ -14,7 +14,7 @@ public interface ILoginService {
      * @param user 用户信息
      * @return
      */
-    boolean saveLoginInfo(Login user);
+    boolean saveLoginInfo(Login user,String email);
 
     /**
      * 校验用户

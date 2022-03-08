@@ -70,9 +70,7 @@ public class JwtUtil {
             throw new CreateException(10000,"jwtToken不能为空");
         }
         DecodedJWT decode = JWT.decode(jwtToken);
-        Map<String, Claim> claims = decode.getClaims();
-
-        return claims;
+        return decode.getClaims();
     }
 
 

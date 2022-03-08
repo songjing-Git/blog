@@ -15,6 +15,6 @@ public interface IUserService extends IService<User> {
 
     User getUserInfo(String username);
 
-
+    boolean updateUserInfo(User user);
 
 }

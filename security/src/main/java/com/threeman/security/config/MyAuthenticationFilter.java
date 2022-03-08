@@ -22,16 +22,19 @@ public class MyAuthenticationFilter extends UsernamePasswordAuthenticationFilter
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        if (!request.getMethod().equals("POST")) {
+        logger.info("请求方式:"+request.getMethod());
+        if (!"POST".equals(request.getMethod())) {
             throw new AuthenticationServiceException(
                     "Authentication method not supported: " + request.getMethod());
         }
-
-        if (request.getContentType().equals(MediaType.APPLICATION_JSON_VALUE)){
+        logger.info("请求格式:"+request.getContentType().equals(MediaType.APPLICATION_JSON_UTF8_VALUE));
+        if (request.getContentType().equals(MediaType.APPLICATION_JSON_VALUE)||
+                request.getContentType().equals(MediaType.APPLICATION_JSON_UTF8_VALUE)){
             String username = null;
             String password = null;
             try {
                 Map<String,String> map=new ObjectMapper().readValue(request.getInputStream(),Map.class);
+                logger.info("UsernameParameter:"+super.getUsernameParameter());
                 username=map.get(super.getUsernameParameter());
                 password=map.get(super.getPasswordParameter());
                 Object rememberMe=map.get("remember_value");
@@ -44,6 +47,7 @@ public class MyAuthenticationFilter extends UsernamePasswordAuthenticationFilter
                 }
 
                 username = username.trim();
+                logger.info("username:"+username);
                 request.setAttribute("remember_value",rememberMe);
                 UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
                         username, password);

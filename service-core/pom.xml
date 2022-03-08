@@ -13,7 +13,23 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <elasticsearch-version>7.5.1</elasticsearch-version>
+    </properties>
+
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/io.minio/minio -->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+
+
         <dependency>
             <groupId>com.threeman</groupId>
             <artifactId>api</artifactId>
@@ -32,6 +48,11 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>1.2.5</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.alibaba.cloud/spring-cloud-starter-alibaba-nacos-discovery -->
 <!--        <dependency>-->

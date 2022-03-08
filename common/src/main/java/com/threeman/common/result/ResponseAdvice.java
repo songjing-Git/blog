@@ -73,7 +73,7 @@ public class ResponseAdvice implements ResponseBodyAdvice<Object> {
                 return new Result<>(ResultEnum.DEFAULT_SUCCESS,(String)message);
             }
             Object error = ((Map<?, ?>) body).get("error");
-            return new Result<>(ResultEnum.DEFAULT_FAILED,(String)error);
+            return new Result<>((int)status,(String)error);
         }
         return new Result<>(ResultEnum.DEFAULT_SUCCESS, body);
     }

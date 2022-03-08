@@ -1,5 +1,6 @@
 package com.threeman.servicecore.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.threeman.servicecore.entity.User;
 import com.threeman.servicecore.mapper.UserMapper;
@@ -24,6 +25,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public User getUserInfo(String username) {
         return  userMapper.getUserInfo(username);
+    }
+
+    @Override
+    public boolean updateUserInfo(User user) {
+        QueryWrapper<User> queryWrapper=new QueryWrapper<>();
+        queryWrapper.eq("user_name",user.getUserName());
+        return userMapper.update(user, queryWrapper) == 1;
     }
 
 

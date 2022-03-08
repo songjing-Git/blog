@@ -2,6 +2,7 @@ package com.threeman.servicecore.entity;
 
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,8 +27,8 @@ public class User implements Serializable {
     /**
      * 用户id
      */
-    @TableField("user_id")
-    private Integer userId;
+    @TableId("user_id")
+    private Long userId;
 
     /**
      * 用户昵称
