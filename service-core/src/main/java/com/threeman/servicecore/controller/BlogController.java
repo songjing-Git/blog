@@ -2,7 +2,6 @@ package com.threeman.servicecore.controller;
 
 import com.threeman.common.entity.Dictionary;
 import com.threeman.common.service.DictionaryService;
-import com.threeman.servicecore.entity.BlogInfo;
 import com.threeman.servicecore.service.BlogInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +32,25 @@ public class BlogController {
     }
 
     @PutMapping("/insertBlog")
-    public boolean insertBlog(@RequestBody BlogInfo blogInfo){
-         return blogInfoService.insertBlogInfo(blogInfo);
+    public boolean insertBlog(@RequestBody Map<String,Object> param){
+         return blogInfoService.insertBlogInfo(param);
     }
 
-    @GetMapping("/getBlogInfos")
-    public List<Map<String,Object>> findBlogInfos(@RequestParam String text){
+    @GetMapping("/getBlogInfos/{text}")
+    public List<Map<String,Object>> findBlogInfos(@PathVariable String text){
         log.info("text:{}",text);
         return blogInfoService.findBlogInfos(text);
+    }
+
+    @GetMapping("/getBlogInfo/{blogId}")
+    public Map<String,Object> findBlogInfo(@PathVariable long blogId ){
+        log.info("blogId:{}",blogId);
+        return blogInfoService.findBlogInfo(blogId);
+    }
+
+    @GetMapping("/getBlogInfosByPage/{text}")
+    public List<Map<String,Object>> findBlogInfosByPage(@PathVariable String text,
+                                                        @RequestParam(defaultValue = "0") int from,@RequestParam(defaultValue = "3") int size){
+        return blogInfoService.findBlogInfosByPage(text,from,size);
     }
 }

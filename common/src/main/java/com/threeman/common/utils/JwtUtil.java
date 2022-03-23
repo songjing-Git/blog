@@ -82,11 +82,12 @@ public class JwtUtil {
     public static boolean isJwtExpire(String jwtToken) {
         Map<String, Claim> payload = getPayload(jwtToken);
         if (payload!=null&&!payload.isEmpty()){
-            Date exp = payload.get("exp").asDate();
+           /* Date exp = payload.get("exp").asDate();
             if (exp.before(new Date())){
                 return true;
             }
-            return false;
+            return false;*/
+            return true;
         }
         return false;
     }

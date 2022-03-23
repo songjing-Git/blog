@@ -1,16 +1,21 @@
 package com.threeman.common.utils;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.read.builder.ExcelReaderBuilder;
 import com.alibaba.excel.read.builder.ExcelReaderSheetBuilder;
 import com.alibaba.excel.write.builder.ExcelWriterBuilder;
 import com.alibaba.excel.write.builder.ExcelWriterSheetBuilder;
+import com.alibaba.excel.write.metadata.WriteSheet;
+import com.alibaba.excel.write.metadata.WriteWorkbook;
 import com.threeman.common.excel.listener.Listener;
 import com.threeman.common.exception.CreateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -57,6 +62,26 @@ public class FileUtil {
         ExcelWriterBuilder write = EasyExcel.write(fileOutputStream, clazz);
         ExcelWriterSheetBuilder sheet = write.sheet();
         sheet.doWrite(list);
+    }
+
+
+    public static void listToFileResponse(List<Object> list, Class clazz,
+                                                         String originalFilename,HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.ms-excel");
+        response.setCharacterEncoding("utf8");
+        response.setHeader("Content-Disposition", "attachment; filename=" + originalFilename);
+        response.setHeader("Pragma", "public");
+        response.setHeader("Cache-Control", "no-store");
+        response.addHeader("Cache-Control", "max-age=0");
+        WriteWorkbook writeWorkbook = new WriteWorkbook();
+        writeWorkbook.setOutputStream(response.getOutputStream());
+        writeWorkbook.setClazz(clazz);
+        writeWorkbook.setCharset(Charset.defaultCharset());
+        ExcelWriter writer =
+                new ExcelWriter(writeWorkbook);
+        WriteSheet writeSheet = new WriteSheet();
+        writer.write(list,writeSheet );
+        writer.finish();
     }
 
     /**

@@ -30,7 +30,7 @@ public class ResponseAdvice implements ResponseBodyAdvice<Object> {
      */
     @Override
     public boolean supports(MethodParameter methodParameter, Class aClass) {
-        return true;
+        return !methodParameter.getDeclaringClass().getName().contains("springfox");
     }
 
 

@@ -45,6 +45,7 @@ public class JwtAuthorizationTokenFilter extends BasicAuthenticationFilter {
         if (StringUtils.isEmpty(token)){
             throw new CreateException("认证失败，jwt不能为空");
         }
+        SecurityContextHolder.getContext().setAuthentication(getAuthentication(token));
         if (!JwtUtil.isJwtExpire(token)){
             SecurityContextHolder.getContext().setAuthentication(getAuthentication(token));
         }else {

@@ -49,7 +49,7 @@ public class MinioController {
         }
     }
 
-    @PutMapping("/upload/blog")
+    @PutMapping(value = "/upload/blog")
     public Object upload(MultipartFile file){
         log.info("file:{}",file.isEmpty());
         try {
@@ -63,7 +63,7 @@ public class MinioController {
             log.info("etag:{}",objectWriteResponse.etag());
             log.info("versionId:{}",objectWriteResponse.versionId());
             GetPresignedObjectUrlArgs getAvater = GetPresignedObjectUrlArgs.builder()
-                    .bucket("avater").object(file.getOriginalFilename())
+                    .bucket("blog-images").object(file.getOriginalFilename())
                     .method(Method.GET)
                     //.expiry(60, TimeUnit.SECONDS)
                     .build();

@@ -142,13 +142,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web)  {
         web.ignoring().antMatchers("/index.html", "/static/**","/favicon.ico")
-                .antMatchers("/register","/verifiesUser","/sendVerifiesCode/*","/updatePassword","/addUserRole","/findLabels/*","/insertBlog","/getBlogInfos")
+                .antMatchers("/register","/insertEsModel","/verifiesUser","/sendVerifiesCode/*",
+                        "/updatePassword","/addUserRole","/findLabels/*","/insertBlog","/getBlogInfos/*"
+                        ,"/excelReader","/excelReaderByOrderId","/getBlogInfo/*","/getBlogInfosByPage/*")
                 // 给 swagger 放行 不需要权限能访问的资源
-                .antMatchers("/swagger-ui.html","/doc.html",
+                .antMatchers("/swagger-ui.html","/doc.html","/null/**",
                         "/swagger-resources/**",
                         "/images/**",
                         "/webjars/**",
                         "/v2/api-docs",
+                        "/csrf",
                         "/configuration/ui",
                         "/configuration/security",
                         "/swagger-resources/configuration/security",

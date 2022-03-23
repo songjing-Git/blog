@@ -15,7 +15,11 @@ import java.util.Map;
  */
 public interface BlogInfoService extends IService<BlogInfo> {
 
-    boolean insertBlogInfo(BlogInfo blogInfo);
+    boolean insertBlogInfo(Map<String,Object> param);
 
     List<Map<String,Object>> findBlogInfos(String text);
+
+    Map<String, Object> findBlogInfo(long blogId);
+
+    List<Map<String, Object>> findBlogInfosByPage(String text, int from, int size);
 }
