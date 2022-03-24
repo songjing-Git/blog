@@ -27,7 +27,7 @@ public class JwtUtil {
 
     private final static String KEY = "singJin3";
 
-    private final static long OUT_TIME =60*60*1000;
+    private final static long OUT_TIME =24*60*60*1000;
 
 
     public static String getJwtToken(String userId, String username ,String password, List<String> authorities){
@@ -82,12 +82,11 @@ public class JwtUtil {
     public static boolean isJwtExpire(String jwtToken) {
         Map<String, Claim> payload = getPayload(jwtToken);
         if (payload!=null&&!payload.isEmpty()){
-           /* Date exp = payload.get("exp").asDate();
+            Date exp = payload.get("exp").asDate();
             if (exp.before(new Date())){
                 return true;
             }
-            return false;*/
-            return true;
+            return false;
         }
         return false;
     }
