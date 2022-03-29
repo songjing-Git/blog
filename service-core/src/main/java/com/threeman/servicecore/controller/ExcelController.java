@@ -9,6 +9,8 @@ import com.threeman.common.utils.FileUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +32,9 @@ import java.util.Map;
 @Api("excel导出功能")
 public class ExcelController {
 
+
+    @Autowired
+    RedisTemplate<String,Object> redisTemplate;
 
     @ApiOperation("短书订单导出，仅小胖使用")
     @PostMapping("/excelReader")
@@ -120,4 +125,15 @@ public class ExcelController {
         }
         FileUtil.listToFileResponse(result,Entity.class,"订单详情.xlsx",response);
     }
+
+
+    @ApiOperation("test")
+    @PostMapping("/test")
+    public String excelReader(String ok){
+        redisTemplate.opsForValue().set("test",ok);
+        Object text = redisTemplate.opsForValue().get("test");
+        assert text != null;
+        return text.toString();
+    }
+
 }

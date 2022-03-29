@@ -9,22 +9,22 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j(topic="c.thread")
 public class JUC {
+
+    private static Object ReentrantReadWriteLock;
+
     public static void main(String[] args) {
+        //查看线程数
         try {
-            Thread t1 = new Thread(() -> {
-                try {
-                    Thread.sleep(100000000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }, "t1");
-            log.info("t1.state:{}",t1.getState());
-            t1.start();
-            log.info("t1.state:{}",t1.getState());
-            Thread.sleep(1000);
-            log.info("t1.state:{}",t1.getState());
-        }catch (Exception e){
-            e.getMessage();
+            Runtime.getRuntime().availableProcessors();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Object o = new Object();
+        try {
+            o.wait(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
