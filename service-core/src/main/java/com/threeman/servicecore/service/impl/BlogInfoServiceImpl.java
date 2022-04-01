@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.threeman.common.exception.CreateException;
 import com.threeman.common.utils.DateUtil;
 import com.threeman.servicecore.entity.BlogInfo;
+import com.threeman.servicecore.entity.Comment;
 import com.threeman.servicecore.entity.User;
 import com.threeman.servicecore.mapper.BlogInfoMapper;
 import com.threeman.servicecore.mapper.UserMapper;
@@ -31,6 +33,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -58,6 +61,9 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
 
     @Autowired
     UserMapper userMapper;
+
+    @Autowired
+    RedisTemplate<String,Object> redisTemplate;
 
     @SneakyThrows
     @Override
@@ -306,5 +312,79 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
             }
         }
         return result;
+    }
+
+    @Override
+    public long addBlogView(long blogInfoId) {
+
+        return redisTemplate.opsForHash().increment("view",String.valueOf(blogInfoId),1L);
+    }
+
+    @Override
+    public long addBlogSupport(long blogInfoId) {
+        return redisTemplate.opsForHash().increment("support",String.valueOf(blogInfoId),1L);
+    }
+
+    @Override
+    public long addBlogComment(Comment comment) {
+        comment.setCommentId(IdWorker.getId());
+        String blogId = comment.getBlogId().toString();
+        Long aLong = redisTemplate.opsForList().rightPush(blogId, comment);
+        return aLong==null?0:aLong;
+    }
+
+
+    @Override
+    public long delBlogView(long blogInfoId) {
+        Object view = redisTemplate.opsForHash().get( "view",String.valueOf(blogInfoId));
+        if (view==null|| view.equals(0)){
+            return 0;
+        }
+        return redisTemplate.opsForHash().increment( "view",String.valueOf(blogInfoId), -1);
+    }
+
+    @Override
+    public long delBlogSupport(long blogInfoId) {
+        Object support = redisTemplate.opsForHash().get( "support",String.valueOf(blogInfoId));
+        if (support==null|| support.equals(0)){
+            return 0;
+        }
+        return redisTemplate.opsForHash().increment( "support",String.valueOf(blogInfoId), -1L);
+    }
+
+    @Override
+    public long delBlogComment(long blogInfoId) {
+        Object comment = redisTemplate.opsForHash().get(String.valueOf(blogInfoId), "comment");
+        if (comment==null|| comment.equals(0)){
+            return 0;
+        }
+        return redisTemplate.opsForHash().increment(String.valueOf(blogInfoId), "comment", -1L);
+    }
+
+    @Override
+    public List<Comment> findBlogComment(long blogInfoId) {
+        String blogId = String.valueOf(blogInfoId);
+        List<Object> ranges = redisTemplate.opsForList().range(blogId, 0, -1);
+        List <Comment> commentList=new ArrayList<>();
+        if (ranges!=null){
+            for (Object comment:ranges){
+                commentList.add((Comment)comment);
+            }
+        }
+        return getComments(commentList, 0);
+    }
+
+    private List<Comment> getComments(List<Comment> commentList,long pid){
+        if (commentList==null){
+            return null;
+        }
+        List<Comment> treeList=new ArrayList<>();
+        for (Comment comment : commentList) {
+            if (pid==comment.getParentId()){
+                comment.setChildren(getComments(commentList, comment.getCommentId()));
+                treeList.add(comment);
+            }
+        }
+        return treeList;
     }
 }

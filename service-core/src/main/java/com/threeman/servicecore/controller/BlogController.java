@@ -1,7 +1,9 @@
 package com.threeman.servicecore.controller;
 
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.threeman.common.entity.Dictionary;
 import com.threeman.common.service.DictionaryService;
+import com.threeman.servicecore.entity.Comment;
 import com.threeman.servicecore.service.BlogInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,5 +54,42 @@ public class BlogController {
     public List<Map<String,Object>> findBlogInfosByPage(@PathVariable String text,
                                                         @RequestParam(defaultValue = "0") int from,@RequestParam(defaultValue = "3") int size){
         return blogInfoService.findBlogInfosByPage(text,from,size);
+    }
+
+    @PutMapping("/addBlogView/{blogInfoId}")
+    public long addBlogView(@PathVariable long blogInfoId){
+        return blogInfoService.addBlogView(blogInfoId);
+    }
+
+    @PutMapping("/addBlogSupport/{blogInfoId}")
+    public long addBlogSupport(@PathVariable long blogInfoId){
+        return blogInfoService.addBlogSupport(blogInfoId);
+    }
+
+    @RequestMapping(value = "/addBlogComment",method =RequestMethod.PUT )
+    public long addBlogComment(@RequestBody Comment comment){
+        log.info("comment:{}",comment);
+
+        return blogInfoService.addBlogComment(comment);
+    }
+
+    @DeleteMapping("/delBlogView/{blogInfoId}")
+    public long delBlogView(@PathVariable long blogInfoId){
+        return blogInfoService.delBlogView(blogInfoId);
+    }
+
+    @DeleteMapping("/delBlogSupport/{blogInfoId}")
+    public long delBlogSupport(@PathVariable long blogInfoId){
+        return blogInfoService.delBlogSupport(blogInfoId);
+    }
+
+    @DeleteMapping("/delBlogComment/{blogInfoId}")
+    public long delBlogComment(@PathVariable long blogInfoId){
+        return blogInfoService.delBlogComment(blogInfoId);
+    }
+
+    @GetMapping("/findBlogComment/{blogInfoId}")
+    public List<Comment> findBlogComment(@PathVariable long blogInfoId){
+        return blogInfoService.findBlogComment(blogInfoId);
     }
 }
