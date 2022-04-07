@@ -1,6 +1,5 @@
 package com.threeman.servicecore.controller;
 
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.threeman.common.entity.Dictionary;
 import com.threeman.common.service.DictionaryService;
 import com.threeman.servicecore.entity.Comment;
@@ -71,11 +70,6 @@ public class BlogController {
         log.info("comment:{}",comment);
 
         return blogInfoService.addBlogComment(comment);
-    }
-
-    @DeleteMapping("/delBlogView/{blogInfoId}")
-    public long delBlogView(@PathVariable long blogInfoId){
-        return blogInfoService.delBlogView(blogInfoId);
     }
 
     @DeleteMapping("/delBlogSupport/{blogInfoId}")

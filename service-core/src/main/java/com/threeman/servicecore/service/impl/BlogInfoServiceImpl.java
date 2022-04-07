@@ -335,15 +335,6 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
 
 
     @Override
-    public long delBlogView(long blogInfoId) {
-        Object view = redisTemplate.opsForHash().get( "view",String.valueOf(blogInfoId));
-        if (view==null|| view.equals(0)){
-            return 0;
-        }
-        return redisTemplate.opsForHash().increment( "view",String.valueOf(blogInfoId), -1);
-    }
-
-    @Override
     public long delBlogSupport(long blogInfoId) {
         Object support = redisTemplate.opsForHash().get( "support",String.valueOf(blogInfoId));
         if (support==null|| support.equals(0)){

@@ -92,6 +92,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             throw  new CreateException(402,"获取权限信息失败");
         }
         http.authorizeRequests().antMatchers("/login").permitAll();
+        http.authorizeRequests().antMatchers("/login").permitAll();
         http.authorizeRequests().antMatchers("/favicon.ico").permitAll();
         http.formLogin().loginProcessingUrl("/login")
         .successHandler(mySuccessHandle)
