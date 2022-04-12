@@ -31,7 +31,7 @@ public interface BlogInfoService extends IService<BlogInfo> {
 
     long addBlogComment(Comment comment);
 
-    long delBlogSupport(long blogInfoId);
+    long delBlogSupport(Support support);
 
     long delBlogComment(long blogInfoId);
 

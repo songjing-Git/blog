@@ -79,8 +79,8 @@ public class BlogController {
     }
 
     @DeleteMapping("/delBlogSupport/{blogInfoId}")
-    public long delBlogSupport(@PathVariable long blogInfoId){
-        return blogInfoService.delBlogSupport(blogInfoId);
+    public long delBlogSupport(@PathVariable Support support){
+        return blogInfoService.delBlogSupport(support);
     }
 
     @DeleteMapping("/delBlogComment/{blogInfoId}")

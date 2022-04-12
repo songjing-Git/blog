@@ -354,10 +354,9 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
      */
     @Override
     public long addBlogSupport(Support support) {
-        redisTemplate.opsForList().rightPush("supportBlog",support);
-        List<Object> supportObject = redisTemplate.opsForList().range("supportBlog", 0, -1);
-        assert supportObject != null;
-        return supportObject.size();
+        redisTemplate.opsForHash().put("supportBlog",support.getUserId(),support);
+        return  redisTemplate.opsForHash().size("supportBlog");
+
     }
 
     /**
@@ -367,24 +366,19 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
      */
     @Override
     public long addCommentSupport(Support support) {
-        redisTemplate.opsForList().rightPush("supportComment",support);
-        List<Object> supportObject = redisTemplate.opsForList().range("supportComment",0,-1);
-        assert supportObject != null;
-        return supportObject.size();
+        redisTemplate.opsForHash().put("supportComment",support.getUserId(),support);
+        return redisTemplate.opsForHash().size("supportComment");
+
     }
 
     /**
      * 博客点赞取消
-     * @param blogInfoId
+     * @param support
      * @return
      */
     @Override
-    public long delBlogSupport(long blogInfoId) {
-        Object support = redisTemplate.opsForHash().get( "support",String.valueOf(blogInfoId));
-        if (support==null|| support.equals(0)){
-            return 0;
-        }
-        return redisTemplate.opsForHash().increment( "support",String.valueOf(blogInfoId), -1L);
+    public long delBlogSupport(Support support) {
+        return redisTemplate.opsForHash().delete("supportBlog", support.getUserId());
     }
 
     /**
@@ -446,13 +440,6 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         }
         List<Comment> comments = getComments(commentList, 0);
         List<Comment> parent = findParent(comments);
-        List<Support> blogSupportList=new ArrayList<>();
-        /*if (supportObject==null){
-            throw new CreateException("服务端点赞数据失效，请联系管理员");
-        }
-        for (Object o :  supportObject) {
-            blogSupportList.add ((Support) o);
-        }*/
         return parent;
     }
 
