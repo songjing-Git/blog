@@ -4,6 +4,7 @@ package com.threeman.servicecore.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.threeman.servicecore.entity.BlogInfo;
 import com.threeman.servicecore.entity.Comment;
+import com.threeman.servicecore.entity.Support;
 
 import java.util.List;
 import java.util.Map;
@@ -26,15 +27,15 @@ public interface BlogInfoService extends IService<BlogInfo> {
 
     long addBlogView(long blogInfoId);
 
-    long addBlogSupport(long blogInfoId);
+    long addBlogSupport(Support support);
 
     long addBlogComment(Comment comment);
-
-
 
     long delBlogSupport(long blogInfoId);
 
     long delBlogComment(long blogInfoId);
 
     List<Comment> findBlogComment(long blogInfoId);
+
+    long addCommentSupport(Support support);
 }

@@ -10,6 +10,7 @@ import com.threeman.common.exception.CreateException;
 import com.threeman.common.utils.DateUtil;
 import com.threeman.servicecore.entity.BlogInfo;
 import com.threeman.servicecore.entity.Comment;
+import com.threeman.servicecore.entity.Support;
 import com.threeman.servicecore.entity.User;
 import com.threeman.servicecore.mapper.BlogInfoMapper;
 import com.threeman.servicecore.mapper.UserMapper;
@@ -65,6 +66,11 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
     @Autowired
     RedisTemplate<String,Object> redisTemplate;
 
+    /**
+     * 插入博客文章
+     * @param param
+     * @return
+     */
     @SneakyThrows
     @Override
     public boolean insertBlogInfo(Map<String,Object> param) {
@@ -160,6 +166,11 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         return index.status().getStatus()!=0;
     }
 
+    /**
+     * 搜索博客文章
+     * @param text
+     * @return
+     */
     @Override
     public List<Map<String,Object>> findBlogInfos(String text) {
         SearchRequest searchRequest = new SearchRequest(blog_index);
@@ -211,6 +222,11 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         return result;
     }
 
+    /**
+     * 查找博客文章
+     * @param blogId
+     * @return
+     */
     @Override
     public Map<String, Object> findBlogInfo(long blogId) {
         BlogInfo blogInfo = blogInfoMapper.selectById(blogId);
@@ -243,6 +259,13 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         return blogInfoMap;
     }
 
+    /**
+     * 分页搜索文章
+     * @param text
+     * @param from
+     * @param size
+     * @return
+     */
     @Override
     public List<Map<String, Object>> findBlogInfosByPage(String text, int from, int size) {
         SearchRequest searchRequest = new SearchRequest(blog_index);
@@ -314,26 +337,47 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         return result;
     }
 
+    /**
+     * 添加浏览量
+     * @param blogInfoId
+     * @return
+     */
     @Override
     public long addBlogView(long blogInfoId) {
-
         return redisTemplate.opsForHash().increment("view",String.valueOf(blogInfoId),1L);
     }
 
+    /**
+     * 博客点赞
+     * @param support
+     * @return
+     */
     @Override
-    public long addBlogSupport(long blogInfoId) {
-        return redisTemplate.opsForHash().increment("support",String.valueOf(blogInfoId),1L);
+    public long addBlogSupport(Support support) {
+        redisTemplate.opsForList().rightPush("supportBlog",support);
+        List<Object> supportObject = redisTemplate.opsForList().range("supportBlog", 0, -1);
+        assert supportObject != null;
+        return supportObject.size();
     }
 
+    /**
+     * 添加评论点赞
+     * @param support
+     * @return
+     */
     @Override
-    public long addBlogComment(Comment comment) {
-        comment.setCommentId(IdWorker.getId());
-        String blogId = comment.getBlogId().toString();
-        Long aLong = redisTemplate.opsForList().rightPush(blogId, comment);
-        return aLong==null?0:aLong;
+    public long addCommentSupport(Support support) {
+        redisTemplate.opsForList().rightPush("supportComment",support);
+        List<Object> supportObject = redisTemplate.opsForList().range("supportComment",0,-1);
+        assert supportObject != null;
+        return supportObject.size();
     }
 
-
+    /**
+     * 博客点赞取消
+     * @param blogInfoId
+     * @return
+     */
     @Override
     public long delBlogSupport(long blogInfoId) {
         Object support = redisTemplate.opsForHash().get( "support",String.valueOf(blogInfoId));
@@ -343,6 +387,39 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         return redisTemplate.opsForHash().increment( "support",String.valueOf(blogInfoId), -1L);
     }
 
+    /**
+     * 添加博客评论
+     * @param comment
+     * @return
+     */
+    @Override
+    public long addBlogComment(Comment comment) {
+        comment.setCommentId(IdWorker.getId());
+        BlogInfo blogInfo = blogInfoMapper.selectById(comment.getBlogId());
+        if (blogInfo==null){
+            throw new CreateException("该博文不存在");
+        }
+        User user = userMapper.selectById(blogInfo.getBlogAuthorId());
+        if (user==null){
+            throw new CreateException("该作者不存在");
+        }
+        if(comment.getNickName().equals(user.getUserName())){
+            comment.setAuthor(true);
+        }else {
+            comment.setAuthor(false);
+        }
+        comment.setCommentDate(DateUtil.localDateTimeConvertToDate(LocalDateTime.now()));
+        String blogId = comment.getBlogId().toString();
+        Long aLong = redisTemplate.opsForList().rightPush(blogId, comment);
+        return aLong==null?0:aLong;
+    }
+
+
+    /**
+     * 取消博客评论
+     * @param blogInfoId
+     * @return
+     */
     @Override
     public long delBlogComment(long blogInfoId) {
         Object comment = redisTemplate.opsForHash().get(String.valueOf(blogInfoId), "comment");
@@ -352,6 +429,11 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         return redisTemplate.opsForHash().increment(String.valueOf(blogInfoId), "comment", -1L);
     }
 
+    /**
+     * 查看博客评论
+     * @param blogInfoId
+     * @return
+     */
     @Override
     public List<Comment> findBlogComment(long blogInfoId) {
         String blogId = String.valueOf(blogInfoId);
@@ -362,8 +444,18 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
                 commentList.add((Comment)comment);
             }
         }
-        return getComments(commentList, 0);
+        List<Comment> comments = getComments(commentList, 0);
+        List<Comment> parent = findParent(comments);
+        List<Support> blogSupportList=new ArrayList<>();
+        /*if (supportObject==null){
+            throw new CreateException("服务端点赞数据失效，请联系管理员");
+        }
+        for (Object o :  supportObject) {
+            blogSupportList.add ((Support) o);
+        }*/
+        return parent;
     }
+
 
     private List<Comment> getComments(List<Comment> commentList,long pid){
         if (commentList==null){
@@ -378,4 +470,44 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         }
         return treeList;
     }
+
+    public List<Comment> findParent(List<Comment> comments) {
+
+        for (Comment comment : comments) {
+
+            // 防止checkForComodification(),而建立一个新集合
+            ArrayList<Comment> fatherChildren = new ArrayList<>();
+
+            // 递归处理子级的回复，即回复内有回复
+            findChildren(comment, fatherChildren);
+
+            // 将递归处理后的集合放回父级的孩子中
+            comment.setChildren(fatherChildren);
+        }
+        return comments;
+    }
+
+
+    public void findChildren(Comment parent, List<Comment> fatherChildren) {
+
+        // 找出直接子级
+        List<Comment> comments = parent.getChildren();
+
+        // 遍历直接子级的子级
+        for (Comment comment : comments) {
+
+            // 若非空，则还有子级，递归
+            if (!comment.getChildren().isEmpty()) {
+                findChildren(comment, fatherChildren);
+            }
+
+            // 已经到了最底层的嵌套关系，将该回复放入新建立的集合
+            fatherChildren.add(comment);
+
+            // 容易忽略的地方：将相对底层的子级放入新建立的集合之后
+            // 则表示解除了嵌套关系，对应的其父级的子级应该设为空
+            comment.setChildren(new ArrayList<>());
+        }
+    }
+
 }

@@ -1,11 +1,10 @@
 package com.threeman.servicecore.controller;
 
 import com.threeman.common.exception.CreateException;
-import io.minio.GetPresignedObjectUrlArgs;
+import com.threeman.servicecore.config.minio.MinioConfig;
 import io.minio.MinioClient;
 import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
-import io.minio.http.Method;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,6 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @Slf4j
 public class MinioController {
+
+    @Autowired
+    MinioConfig minioConfig;
 
     @Autowired
     MinioClient minioClient;
@@ -38,12 +40,13 @@ public class MinioController {
             ObjectWriteResponse objectWriteResponse = minioClient.putObject(putAvater);
             log.info("etag:{}",objectWriteResponse.etag());
             log.info("versionId:{}",objectWriteResponse.versionId());
-            GetPresignedObjectUrlArgs getAvater = GetPresignedObjectUrlArgs.builder()
+            /*GetPresignedObjectUrlArgs getAvater = GetPresignedObjectUrlArgs.builder()
                     .bucket("avater").object(username+"-"+file.getOriginalFilename())
                     .method(Method.GET)
                     //.expiry(60, TimeUnit.SECONDS)
                     .build();
-            return minioClient.getPresignedObjectUrl(getAvater);
+            return minioClient.getPresignedObjectUrl(getAvater);*/
+            return minioConfig.getEndPoint()+"/avater/"+username+"-"+file.getOriginalFilename();
         }catch (Exception ignored){
             return new CreateException(0,ignored.getMessage());
         }
@@ -51,7 +54,9 @@ public class MinioController {
 
     @PutMapping(value = "/upload/blog")
     public Object upload(MultipartFile file){
-        log.info("file:{}",file.isEmpty());
+        if (file==null||file.isEmpty()){
+            throw new CreateException("上传文件不能为空");
+        }
         try {
             PutObjectArgs putAvater = PutObjectArgs.builder()
                     .object(file.getOriginalFilename())
@@ -62,12 +67,14 @@ public class MinioController {
             ObjectWriteResponse objectWriteResponse = minioClient.putObject(putAvater);
             log.info("etag:{}",objectWriteResponse.etag());
             log.info("versionId:{}",objectWriteResponse.versionId());
-            GetPresignedObjectUrlArgs getAvater = GetPresignedObjectUrlArgs.builder()
-                    .bucket("blog-images").object(file.getOriginalFilename())
-                    .method(Method.GET)
-                    //.expiry(60, TimeUnit.SECONDS)
-                    .build();
-            return minioClient.getPresignedObjectUrl(getAvater);
+//            GetPresignedObjectUrlArgs getAvater = GetPresignedObjectUrlArgs.builder()
+//                    .bucket("blog-images").object(file.getOriginalFilename())
+//                    .method(Method.GET)
+//                    //.expiry(7, TimeUnit.DAYS)
+//                    .build();
+//            return minioClient.getPresignedObjectUrl(getAvater);
+
+            return minioConfig.getEndPoint()+"/blog-images/"+file.getOriginalFilename();
         }catch (Exception ignored){
             return new CreateException(0,ignored.getMessage());
         }

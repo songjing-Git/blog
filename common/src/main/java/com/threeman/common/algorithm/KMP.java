@@ -7,4 +7,8 @@ package com.threeman.common.algorithm;
  * @描述 字符串匹配算法
  */
 public class KMP {
+
+    /**
+     *
+     */
 }

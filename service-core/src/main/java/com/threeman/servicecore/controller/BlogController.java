@@ -3,6 +3,7 @@ package com.threeman.servicecore.controller;
 import com.threeman.common.entity.Dictionary;
 import com.threeman.common.service.DictionaryService;
 import com.threeman.servicecore.entity.Comment;
+import com.threeman.servicecore.entity.Support;
 import com.threeman.servicecore.service.BlogInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +61,14 @@ public class BlogController {
         return blogInfoService.addBlogView(blogInfoId);
     }
 
-    @PutMapping("/addBlogSupport/{blogInfoId}")
-    public long addBlogSupport(@PathVariable long blogInfoId){
-        return blogInfoService.addBlogSupport(blogInfoId);
+    @PutMapping("/addBlogSupport")
+    public long addBlogSupport(@RequestBody Support support){
+        return blogInfoService.addBlogSupport(support);
+    }
+
+    @PutMapping("/addCommentSupport")
+    public long addCommentSupport(@RequestBody Support support){
+        return blogInfoService.addCommentSupport(support);
     }
 
     @RequestMapping(value = "/addBlogComment",method =RequestMethod.PUT )

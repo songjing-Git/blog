@@ -2,6 +2,7 @@ package com.threeman.servicecore.entity;
 
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,14 +32,20 @@ public class Comment implements Serializable {
     /**
      * 评论Id
      */
-    @TableField("comment_id")
+    @TableId
     private Long commentId;
 
     /**
-     * 昵称
+     * 回复人昵称
      */
     @TableField("nick_name")
     private String nickName;
+
+    /**
+     * 被回复人昵称
+     */
+    @TableField("parent_name")
+    private String parentName;
 
     /**
      * 评论
@@ -56,6 +64,23 @@ public class Comment implements Serializable {
      */
     @TableField("parent_id")
     private Long parentId;
+
+    /**
+     * 是否为作者
+     */
+    @TableField("author")
+    private boolean author;
+
+    /**
+     * 评论点赞
+     */
+    private Long supportCount;
+
+    /**
+     * 评论时间
+     */
+    @TableField("comment_date")
+    private Date commentDate;
 
     private List<Comment> children;
 }
