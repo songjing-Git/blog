@@ -20,11 +20,7 @@ import lombok.experimental.Accessors;
 public class Support {
 
 
-    @TableField("support_id")
-    private Long supportId;
-
-
-    @TableField("Id")
+    @TableField("id")
     private Long id;
 
 

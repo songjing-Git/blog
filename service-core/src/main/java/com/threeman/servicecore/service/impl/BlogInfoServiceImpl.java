@@ -347,39 +347,47 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         return redisTemplate.opsForHash().increment("view",String.valueOf(blogInfoId),1L);
     }
 
+    /*@Autowired
+    RedisTemplate<String,String> strRedisTemplate;*/
+
     /**
-     * 博客点赞
+     * 博客点赞和取消
+     *
      * @param support
      * @return
      */
     @Override
-    public long addBlogSupport(Support support) {
-        redisTemplate.opsForHash().put("supportBlog",support.getUserId(),support);
-        return  redisTemplate.opsForHash().size("supportBlog");
-
+    public long blogSupport(Support support) {
+        Boolean member = redisTemplate.opsForSet().isMember("blogSupport_" + support.getId(),"user_"+support.getUserId());
+        assert member!=null;
+        if (member){
+            redisTemplate.opsForSet().remove("blogSupport_" + support.getId(), "user_"+support.getUserId());
+        }else {
+            redisTemplate.opsForSet().add("blogSupport_"+support.getId(),"user_"+support.getUserId());
+        }
+        Long size = redisTemplate.opsForSet().size("blogSupport_" + support.getId());
+        return  size==null?0:size;
     }
 
     /**
-     * 添加评论点赞
+     * 评论点赞和取消
      * @param support
      * @return
      */
     @Override
-    public long addCommentSupport(Support support) {
-        redisTemplate.opsForHash().put("supportComment",support.getUserId(),support);
-        return redisTemplate.opsForHash().size("supportComment");
+    public long commentSupport(Support support) {
+        Boolean member = redisTemplate.opsForSet().isMember("commentSupport_" + support.getId(), "user_" + support.getUserId());
+        assert member!=null;
+        if (member){
+            redisTemplate.opsForSet().remove("commentSupport_" + support.getId(), "user_" + support.getUserId());
+        }else {
+            redisTemplate.opsForSet().add("commentSupport_" + support.getId(), "user_" + support.getUserId());
+        }
+        Long size = redisTemplate.opsForSet().size("commentSupport_" + support.getId());
+        return size==null?0:size;
 
     }
 
-    /**
-     * 博客点赞取消
-     * @param support
-     * @return
-     */
-    @Override
-    public long delBlogSupport(Support support) {
-        return redisTemplate.opsForHash().delete("supportBlog", support.getUserId());
-    }
 
     /**
      * 添加博客评论
@@ -408,21 +416,6 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         return aLong==null?0:aLong;
     }
 
-
-    /**
-     * 取消博客评论
-     * @param blogInfoId
-     * @return
-     */
-    @Override
-    public long delBlogComment(long blogInfoId) {
-        Object comment = redisTemplate.opsForHash().get(String.valueOf(blogInfoId), "comment");
-        if (comment==null|| comment.equals(0)){
-            return 0;
-        }
-        return redisTemplate.opsForHash().increment(String.valueOf(blogInfoId), "comment", -1L);
-    }
-
     /**
      * 查看博客评论
      * @param blogInfoId
@@ -439,8 +432,19 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
             }
         }
         List<Comment> comments = getComments(commentList, 0);
-        List<Comment> parent = findParent(comments);
-        return parent;
+        return findParent(comments);
+    }
+
+    @Override
+    public long getBlogSupportCount(long blogId) {
+        Long size = redisTemplate.opsForSet().size("blogSupport_" + blogId);
+        return size==null?0:size;
+    }
+
+    @Override
+    public long getCommentSupportCount(long blogId) {
+        Long size = redisTemplate.opsForSet().size("commentSupport_" + blogId);
+        return size==null?0:size;
     }
 
 
@@ -470,6 +474,12 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
 
             // 将递归处理后的集合放回父级的孩子中
             comment.setChildren(fatherChildren);
+            Long size = redisTemplate.opsForSet().size("commentSupport_" + comment.getCommentId());
+            comment.setSupportCount(size);
+            User userInfo = userMapper.getUserInfo(comment.getNickName());
+            comment.setNickAvater(userInfo.getAvater());
+            User parentInfo = userMapper.getUserInfo(comment.getParentName());
+            comment.setParentAvater(parentInfo.getAvater());
         }
         return comments;
     }
@@ -487,7 +497,12 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
             if (!comment.getChildren().isEmpty()) {
                 findChildren(comment, fatherChildren);
             }
-
+            User userInfo = userMapper.getUserInfo(comment.getNickName());
+            comment.setNickAvater(userInfo.getAvater());
+            User parentInfo = userMapper.getUserInfo(comment.getParentName());
+            comment.setParentAvater(parentInfo.getAvater());
+            Long size = redisTemplate.opsForSet().size("commentSupport_" + comment.getCommentId());
+            comment.setSupportCount(size);
             // 已经到了最底层的嵌套关系，将该回复放入新建立的集合
             fatherChildren.add(comment);
 

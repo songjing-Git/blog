@@ -61,14 +61,14 @@ public class BlogController {
         return blogInfoService.addBlogView(blogInfoId);
     }
 
-    @PutMapping("/addBlogSupport")
-    public long addBlogSupport(@RequestBody Support support){
-        return blogInfoService.addBlogSupport(support);
+    @RequestMapping(value = "/blogSupport",method =RequestMethod.PUT)
+    public long blogSupport(@RequestBody Support support){
+        return blogInfoService.blogSupport(support);
     }
 
-    @PutMapping("/addCommentSupport")
-    public long addCommentSupport(@RequestBody Support support){
-        return blogInfoService.addCommentSupport(support);
+    @PutMapping("/commentSupport")
+    public long commentSupport(@RequestBody Support support){
+        return blogInfoService.commentSupport(support);
     }
 
     @RequestMapping(value = "/addBlogComment",method =RequestMethod.PUT )
@@ -78,14 +78,14 @@ public class BlogController {
         return blogInfoService.addBlogComment(comment);
     }
 
-    @DeleteMapping("/delBlogSupport/{blogInfoId}")
-    public long delBlogSupport(@PathVariable Support support){
-        return blogInfoService.delBlogSupport(support);
+    @GetMapping("/getBlogSupportCount/{blogId}")
+    public long getBlogSupportCount(@PathVariable long blogId){
+        return blogInfoService.getBlogSupportCount(blogId);
     }
 
-    @DeleteMapping("/delBlogComment/{blogInfoId}")
-    public long delBlogComment(@PathVariable long blogInfoId){
-        return blogInfoService.delBlogComment(blogInfoId);
+    @GetMapping("/getCommentSupportCount/{blogId}")
+    public long getCommentSupportCount(@PathVariable long blogId){
+        return blogInfoService.getCommentSupportCount(blogId);
     }
 
     @GetMapping("/findBlogComment/{blogInfoId}")

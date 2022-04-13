@@ -42,10 +42,20 @@ public class Comment implements Serializable {
     private String nickName;
 
     /**
+     * 回复人头像
+     */
+    private String nickAvater;
+    /**
      * 被回复人昵称
      */
     @TableField("parent_name")
     private String parentName;
+
+    /**
+     * 被回复人头像
+     */
+    @TableField("parent_avater")
+    private String parentAvater;
 
     /**
      * 评论
