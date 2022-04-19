@@ -44,10 +44,10 @@ public class BlogController {
         return blogInfoService.findBlogInfos(text);
     }
 
-    @GetMapping("/getBlogInfo/{blogId}")
-    public Map<String,Object> findBlogInfo(@PathVariable long blogId ){
+    @GetMapping("/getBlogInfo/{blogId}/{userId}")
+    public Map<String,Object> findBlogInfo(@PathVariable long blogId ,@PathVariable long userId){
         log.info("blogId:{}",blogId);
-        return blogInfoService.findBlogInfo(blogId);
+        return blogInfoService.findBlogInfo(blogId,userId);
     }
 
     @GetMapping("/getBlogInfosByPage/{text}")
@@ -88,8 +88,8 @@ public class BlogController {
         return blogInfoService.getCommentSupportCount(blogId);
     }
 
-    @GetMapping("/findBlogComment/{blogInfoId}")
-    public List<Comment> findBlogComment(@PathVariable long blogInfoId){
-        return blogInfoService.findBlogComment(blogInfoId);
+    @GetMapping("/findBlogComment/{blogInfoId}/{userId}")
+    public List<Comment> findBlogComment(@PathVariable long blogInfoId,@PathVariable long userId){
+        return blogInfoService.findBlogComment(blogInfoId,userId);
     }
 }

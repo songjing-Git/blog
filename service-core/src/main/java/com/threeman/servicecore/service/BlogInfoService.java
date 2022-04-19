@@ -21,7 +21,7 @@ public interface BlogInfoService extends IService<BlogInfo> {
 
     List<Map<String,Object>> findBlogInfos(String text);
 
-    Map<String, Object> findBlogInfo(long blogId);
+    Map<String, Object> findBlogInfo(long blogId,long userId);
 
     List<Map<String, Object>> findBlogInfosByPage(String text, int from, int size);
 
@@ -35,7 +35,7 @@ public interface BlogInfoService extends IService<BlogInfo> {
 
 
 
-    List<Comment> findBlogComment(long blogInfoId);
+    List<Comment> findBlogComment(long blogInfoId,long userId);
 
     long getBlogSupportCount(long blogId);
 

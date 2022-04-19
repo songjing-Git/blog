@@ -146,8 +146,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/register","/insertEsModel","/verifiesUser","/sendVerifiesCode/*",
                         "/updatePassword","/addUserRole","/findLabels/*","/insertBlog","/getBlogInfos/*"
                         ,"/excelReader","/excelReaderByOrderId","/addBlogComment","/delBlogComment/*"
-                        ,"/getBlogInfo/*","/getBlogInfosByPage/*","/addBlogView/*","/blogSupport","/commentSupport"
-                        ,"/blogComment","/findBlogComment/*","/getCommentSupportCount/*","/getBlogSupportCount/*"
+                        ,"/getBlogInfo/**","/getBlogInfosByPage/*","/addBlogView/*","/blogSupport","/commentSupport"
+                        ,"/blogComment","/findBlogComment/**","/getCommentSupportCount/*","/getBlogSupportCount/*"
                 )
                 // 给 swagger 放行 不需要权限能访问的资源
                 .antMatchers("/swagger-ui.html","/doc.html","/null/**",

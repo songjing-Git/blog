@@ -29,4 +29,23 @@ public class DateUtil {
     public static Date localDateTimeConvertToDate(LocalDateTime localDateTime) {
         return Date.from(localDateTime.toInstant(ZoneOffset.of("+8")));
     }
+
+    /**
+     * java设置相对时间
+     */
+    public static String relativeTime(Date date){
+        long l = date.getTime() - localDateTimeConvertToDate(LocalDateTime.now()).getTime();
+        String result;
+        long b=l/1000*3600*24;
+        if (b>=30&&b<365){
+            b=b/30;
+            result=b+"月前";
+        }else if (b>=365){
+            b=b/365;
+            result=b+"年前";
+        }else {
+            result=b+"天前";
+        }
+        return result;
+    }
 }

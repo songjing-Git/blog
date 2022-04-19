@@ -228,7 +228,7 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
      * @return
      */
     @Override
-    public Map<String, Object> findBlogInfo(long blogId) {
+    public Map<String, Object> findBlogInfo(long blogId,long userId) {
         BlogInfo blogInfo = blogInfoMapper.selectById(blogId);
         if (blogInfo==null){
             return null;
@@ -251,6 +251,11 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         }
         Map<String, Object> blogInfoMap = JSON.parseObject(JSONObject.toJSONStringWithDateFormat(blogInfo,"yyyy-MM-dd HH:mm:ss"), new TypeReference<Map<String, Object>>() {
         });
+        if (userId!=0){
+            Boolean member = redisTemplate.opsForSet().isMember("blogSupport_" + blogId, "user_" + userId);
+            blogInfoMap.put("support",member);
+        }
+
         blogInfoMap.put("tags",tagList);
         blogInfoMap.put("imageUrl",imageUrlList);
         Map<String, Object> userInfoMap = JSON.parseObject(JSONObject.toJSONStringWithDateFormat(user,"yyyy-MM-dd HH:mm:ss"), new TypeReference<Map<String, Object>>() {
@@ -422,7 +427,7 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
      * @return
      */
     @Override
-    public List<Comment> findBlogComment(long blogInfoId) {
+    public List<Comment> findBlogComment(long blogInfoId,long userId) {
         String blogId = String.valueOf(blogInfoId);
         List<Object> ranges = redisTemplate.opsForList().range(blogId, 0, -1);
         List <Comment> commentList=new ArrayList<>();
@@ -432,7 +437,7 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
             }
         }
         List<Comment> comments = getComments(commentList, 0);
-        return findParent(comments);
+        return findParent(comments,userId);
     }
 
     @Override
@@ -462,7 +467,7 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         return treeList;
     }
 
-    public List<Comment> findParent(List<Comment> comments) {
+    public List<Comment> findParent(List<Comment> comments,long userId) {
 
         for (Comment comment : comments) {
 
@@ -470,7 +475,7 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
             ArrayList<Comment> fatherChildren = new ArrayList<>();
 
             // 递归处理子级的回复，即回复内有回复
-            findChildren(comment, fatherChildren);
+            findChildren(comment, fatherChildren,userId);
 
             // 将递归处理后的集合放回父级的孩子中
             comment.setChildren(fatherChildren);
@@ -479,13 +484,15 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
             User userInfo = userMapper.getUserInfo(comment.getNickName());
             comment.setNickAvater(userInfo.getAvater());
             User parentInfo = userMapper.getUserInfo(comment.getParentName());
+            Boolean member = redisTemplate.opsForSet().isMember("commentSupport_" + comment.getCommentId(), "user_"+userId);
+            comment.setSupport(member != null);
             comment.setParentAvater(parentInfo.getAvater());
         }
         return comments;
     }
 
 
-    public void findChildren(Comment parent, List<Comment> fatherChildren) {
+    public void findChildren(Comment parent, List<Comment> fatherChildren,long userId) {
 
         // 找出直接子级
         List<Comment> comments = parent.getChildren();
@@ -495,7 +502,7 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
 
             // 若非空，则还有子级，递归
             if (!comment.getChildren().isEmpty()) {
-                findChildren(comment, fatherChildren);
+                findChildren(comment, fatherChildren,userId);
             }
             User userInfo = userMapper.getUserInfo(comment.getNickName());
             comment.setNickAvater(userInfo.getAvater());
@@ -503,6 +510,8 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
             comment.setParentAvater(parentInfo.getAvater());
             Long size = redisTemplate.opsForSet().size("commentSupport_" + comment.getCommentId());
             comment.setSupportCount(size);
+            Boolean member = redisTemplate.opsForSet().isMember("commentSupport_" + comment.getCommentId(), "user_"+userId);
+            comment.setSupport(member);
             // 已经到了最底层的嵌套关系，将该回复放入新建立的集合
             fatherChildren.add(comment);
 

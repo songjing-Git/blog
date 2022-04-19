@@ -84,13 +84,23 @@ public class Comment implements Serializable {
     /**
      * 评论点赞
      */
+    @TableField("support_count")
     private Long supportCount;
 
+    /**
+     * 根据userid判断是否点赞过该评论
+     */
+    private boolean support;
     /**
      * 评论时间
      */
     @TableField("comment_date")
     private Date commentDate;
+
+    /**
+     * 相对时间
+     */
+    private String time;
 
     private List<Comment> children;
 }
