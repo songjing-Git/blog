@@ -3,10 +3,10 @@ package com.threeman.servicecore.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.threeman.common.exception.CreateException;
+import com.threeman.common.thread.JucConfig;
 import com.threeman.common.utils.DateUtil;
 import com.threeman.servicecore.entity.BlogInfo;
 import com.threeman.servicecore.entity.Comment;
@@ -41,6 +41,7 @@ import org.springframework.util.StringUtils;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 博文信息表(BlogInfo)表服务实现类
@@ -141,13 +142,17 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         blogInfo.setBlogType(MapUtils.getIntValue(param,"blog_type",1));
         blogInfo.setSupports(MapUtils.getIntValue(param,"supports",0));
         blogInfo.setViews(MapUtils.getIntValue(param,"views",0));
-        //插入数据库
-        int insert = blogInfoMapper.insert(blogInfo);
-        if (insert==0){
-            throw new CreateException("插入数据库失败");
-        }
-        QueryWrapper<BlogInfo> queryWrapper = new QueryWrapper<>();
-        blogInfo = blogInfoMapper.selectOne(queryWrapper.eq(param.get("blog_title") != null, "blog_title", param.get("blog_title")));
+        ThreadPoolExecutor threadPoolExecutor = JucConfig.getThreadPoolExecutor(authorName);
+        threadPoolExecutor.execute(()->{
+            //插入数据库
+            int insert = blogInfoMapper.insert(blogInfo);
+            if (insert==0){
+                throw new CreateException("插入数据库失败");
+            }
+
+        });
+//        QueryWrapper<BlogInfo> queryWrapper = new QueryWrapper<>();
+//        blogInfo = blogInfoMapper.selectOne(queryWrapper.eq(param.get("blog_title") != null, "blog_title", param.get("blog_title")));
 
         //插入es
         GetIndexRequest getRequest = new GetIndexRequest(blog_index);
@@ -415,7 +420,7 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         }else {
             comment.setAuthor(false);
         }
-        comment.setCommentDate(DateUtil.localDateTimeConvertToDate(LocalDateTime.now()));
+        comment.setCommentDate(DateUtil.localDateTimeConvertToDate(LocalDateTime.now()).toString());
         String blogId = comment.getBlogId().toString();
         Long aLong = redisTemplate.opsForList().rightPush(blogId, comment);
         return aLong==null?0:aLong;
@@ -487,6 +492,7 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
             Boolean member = redisTemplate.opsForSet().isMember("commentSupport_" + comment.getCommentId(), "user_"+userId);
             comment.setSupport(member != null);
             comment.setParentAvater(parentInfo.getAvater());
+            comment.setCommentDate(DateUtil.getPastTime(comment.getCommentDate()));
         }
         return comments;
     }
@@ -512,6 +518,7 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
             comment.setSupportCount(size);
             Boolean member = redisTemplate.opsForSet().isMember("commentSupport_" + comment.getCommentId(), "user_"+userId);
             comment.setSupport(member);
+            comment.setCommentDate(DateUtil.getPastTime(comment.getCommentDate()));
             // 已经到了最底层的嵌套关系，将该回复放入新建立的集合
             fatherChildren.add(comment);
 

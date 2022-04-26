@@ -3,7 +3,7 @@ package com.threeman.common.algorithm.sort;
 import java.util.Arrays;
 import java.util.List;
 
-/**
+/**快速排序
  * @author songjing
  * @version 1.0
  * @date 2022/4/1 15:05

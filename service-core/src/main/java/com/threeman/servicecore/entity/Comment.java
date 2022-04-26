@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -95,7 +94,7 @@ public class Comment implements Serializable {
      * 评论时间
      */
     @TableField("comment_date")
-    private Date commentDate;
+    private String commentDate;
 
     /**
      * 相对时间
