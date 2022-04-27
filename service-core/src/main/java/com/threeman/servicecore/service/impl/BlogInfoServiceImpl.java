@@ -13,6 +13,7 @@ import com.threeman.servicecore.entity.Comment;
 import com.threeman.servicecore.entity.Support;
 import com.threeman.servicecore.entity.User;
 import com.threeman.servicecore.mapper.BlogInfoMapper;
+import com.threeman.servicecore.mapper.CommentMapper;
 import com.threeman.servicecore.mapper.UserMapper;
 import com.threeman.servicecore.service.BlogInfoService;
 import lombok.SneakyThrows;
@@ -22,10 +23,14 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.text.Text;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -36,8 +41,10 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -66,6 +73,9 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
 
     @Autowired
     RedisTemplate<String,Object> redisTemplate;
+
+    @Autowired
+    CommentMapper commentMapper;
 
     /**
      * 插入博客文章
@@ -260,7 +270,6 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
             Boolean member = redisTemplate.opsForSet().isMember("blogSupport_" + blogId, "user_" + userId);
             blogInfoMap.put("support",member);
         }
-
         blogInfoMap.put("tags",tagList);
         blogInfoMap.put("imageUrl",imageUrlList);
         Map<String, Object> userInfoMap = JSON.parseObject(JSONObject.toJSONStringWithDateFormat(user,"yyyy-MM-dd HH:mm:ss"), new TypeReference<Map<String, Object>>() {
@@ -353,12 +362,43 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public long addBlogView(long blogInfoId) {
-        return redisTemplate.opsForHash().increment("view",String.valueOf(blogInfoId),1L);
+        ThreadPoolExecutor threadPoolExecutor = JucConfig.getThreadPoolExecutor(String.valueOf(blogInfoId));
+        long view = redisTemplate.opsForHash().increment("view", String.valueOf(blogInfoId), 1L);
+        //同步mysql
+        threadPoolExecutor.execute(()->{
+            log.info("mysql-blogInfoId:{}",blogInfoId);
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            log.info("mysql-view:{}",view);
+            boolean b = blogInfoMapper.updateBlogViews(blogInfoId, view);
+            if (!b){
+                throw new CreateException("同步mysql失败");
+            }
+        });
+        //同步es
+        threadPoolExecutor.execute(()->{
+            log.info("es-blogInfoId:{}",blogInfoId);
+            log.info("es-view:{}",view);
+            UpdateRequest updateRequest = new UpdateRequest();
+            try {
+                XContentBuilder mapping= XContentFactory.jsonBuilder();
+                UpdateRequest doc = updateRequest.index(blog_index)
+                        .id(String.valueOf(blogInfoId))
+                        .doc(mapping.startObject().field("views", view).endObject());
+                UpdateResponse update = restHighLevelClient.update(doc, RequestOptions.DEFAULT);
+                int status = update.status().getStatus();
+                log.info("status:{}",status);
+            } catch (IOException e) {
+                throw new CreateException("同步es失败");
+            }
+        });
+        return view;
     }
-
-    /*@Autowired
-    RedisTemplate<String,String> strRedisTemplate;*/
 
     /**
      * 博客点赞和取消
@@ -367,7 +407,9 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public long blogSupport(Support support) {
+        ThreadPoolExecutor threadPoolExecutor = JucConfig.getThreadPoolExecutor(support.getUserId().toString());
         Boolean member = redisTemplate.opsForSet().isMember("blogSupport_" + support.getId(),"user_"+support.getUserId());
         assert member!=null;
         if (member){
@@ -375,8 +417,29 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         }else {
             redisTemplate.opsForSet().add("blogSupport_"+support.getId(),"user_"+support.getUserId());
         }
-        Long size = redisTemplate.opsForSet().size("blogSupport_" + support.getId());
-        return  size==null?0:size;
+        Long size=redisTemplate.opsForSet().size("blogSupport_" + support.getId());
+        assert size!=null;
+        threadPoolExecutor.execute(()->{
+            boolean b = blogInfoMapper.updateBlogSupports(support.getId(), size);
+            if (!b){
+                throw new CreateException("同步mysql失败");
+            }
+        });
+        threadPoolExecutor.execute(()->{
+            UpdateRequest updateRequest = new UpdateRequest();
+            try {
+                XContentBuilder mapping= XContentFactory.jsonBuilder();
+                UpdateRequest doc = updateRequest.index(blog_index)
+                        .id(String.valueOf(support.getId()))
+                        .doc(mapping.startObject().field("supports", size).endObject());
+                UpdateResponse update = restHighLevelClient.update(doc, RequestOptions.DEFAULT);
+                int status = update.status().getStatus();
+                log.info("status:{}",status);
+            } catch (IOException e) {
+                throw new CreateException("同步es失败");
+            }
+        });
+        return size;
     }
 
     /**
@@ -385,6 +448,7 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public long commentSupport(Support support) {
         Boolean member = redisTemplate.opsForSet().isMember("commentSupport_" + support.getId(), "user_" + support.getUserId());
         assert member!=null;
@@ -394,8 +458,32 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
             redisTemplate.opsForSet().add("commentSupport_" + support.getId(), "user_" + support.getUserId());
         }
         Long size = redisTemplate.opsForSet().size("commentSupport_" + support.getId());
-        return size==null?0:size;
+        assert size != null;
 
+        ThreadPoolExecutor threadPoolExecutor = JucConfig.getThreadPoolExecutor(support.getUserId().toString());
+
+        threadPoolExecutor.execute(()->{
+            boolean b = blogInfoMapper.updateBlogComments(support.getId(), size);
+            if (!b){
+                throw new CreateException("同步mysql失败");
+            }
+        });
+
+        threadPoolExecutor.execute(()->{
+            UpdateRequest updateRequest = new UpdateRequest();
+            try {
+                XContentBuilder mapping= XContentFactory.jsonBuilder();
+                UpdateRequest doc = updateRequest.index(blog_index)
+                        .id(String.valueOf(support.getId()))
+                        .doc(mapping.startObject().field("comments", size).endObject());
+                UpdateResponse update = restHighLevelClient.update(doc, RequestOptions.DEFAULT);
+                int status = update.status().getStatus();
+                log.info("status:{}",status);
+            } catch (IOException e) {
+                throw new CreateException("同步es失败");
+            }
+        });
+        return size;
     }
 
 
@@ -405,6 +493,7 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public long addBlogComment(Comment comment) {
         comment.setCommentId(IdWorker.getId());
         BlogInfo blogInfo = blogInfoMapper.selectById(comment.getBlogId());
@@ -420,7 +509,24 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         }else {
             comment.setAuthor(false);
         }
-        comment.setCommentDate(DateUtil.localDateTimeConvertToDate(LocalDateTime.now()).toString());
+        Long size = redisTemplate.opsForSet().size("commentSupport_" + comment.getCommentId());
+        comment.setSupportCount(size);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+        String format = dateFormat.format(date);
+        log.info("date:{}",format);
+        comment.setCommentDate(format);
+        ThreadPoolExecutor threadPoolExecutor = JucConfig.getThreadPoolExecutor(comment.getNickName());
+        threadPoolExecutor.execute(()->{
+            int insert = commentMapper.insertComment(comment);
+            if (insert==0){
+                throw new CreateException("评论同步mysql失败");
+            }
+        });
+        User userInfo = userMapper.getUserInfo(comment.getNickName());
+        comment.setNickAvatar(userInfo.getAvatar());
+        User parentInfo = userMapper.getUserInfo(comment.getParentName());
+        comment.setParentAvatar(parentInfo.getAvatar());
         String blogId = comment.getBlogId().toString();
         Long aLong = redisTemplate.opsForList().rightPush(blogId, comment);
         return aLong==null?0:aLong;
@@ -472,7 +578,7 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         return treeList;
     }
 
-    public List<Comment> findParent(List<Comment> comments,long userId) {
+    private List<Comment> findParent(List<Comment> comments,long userId) {
 
         for (Comment comment : comments) {
 
@@ -484,21 +590,17 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
 
             // 将递归处理后的集合放回父级的孩子中
             comment.setChildren(fatherChildren);
-            Long size = redisTemplate.opsForSet().size("commentSupport_" + comment.getCommentId());
-            comment.setSupportCount(size);
-            User userInfo = userMapper.getUserInfo(comment.getNickName());
-            comment.setNickAvater(userInfo.getAvater());
-            User parentInfo = userMapper.getUserInfo(comment.getParentName());
             Boolean member = redisTemplate.opsForSet().isMember("commentSupport_" + comment.getCommentId(), "user_"+userId);
             comment.setSupport(member != null);
-            comment.setParentAvater(parentInfo.getAvater());
-            comment.setCommentDate(DateUtil.getPastTime(comment.getCommentDate()));
+            String commentDate = comment.getCommentDate();
+            log.info("commentDate:{}",commentDate);
+            comment.setCommentDate(DateUtil.getPastTime(commentDate));
         }
         return comments;
     }
 
 
-    public void findChildren(Comment parent, List<Comment> fatherChildren,long userId) {
+    private void findChildren(Comment parent, List<Comment> fatherChildren,long userId) {
 
         // 找出直接子级
         List<Comment> comments = parent.getChildren();
@@ -510,14 +612,8 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
             if (!comment.getChildren().isEmpty()) {
                 findChildren(comment, fatherChildren,userId);
             }
-            User userInfo = userMapper.getUserInfo(comment.getNickName());
-            comment.setNickAvater(userInfo.getAvater());
-            User parentInfo = userMapper.getUserInfo(comment.getParentName());
-            comment.setParentAvater(parentInfo.getAvater());
-            Long size = redisTemplate.opsForSet().size("commentSupport_" + comment.getCommentId());
-            comment.setSupportCount(size);
             Boolean member = redisTemplate.opsForSet().isMember("commentSupport_" + comment.getCommentId(), "user_"+userId);
-            comment.setSupport(member);
+            comment.setSupport(member != null);
             comment.setCommentDate(DateUtil.getPastTime(comment.getCommentDate()));
             // 已经到了最底层的嵌套关系，将该回复放入新建立的集合
             fatherChildren.add(comment);

@@ -43,7 +43,7 @@ public class Comment implements Serializable {
     /**
      * 回复人头像
      */
-    private String nickAvater;
+    private String nickAvatar;
     /**
      * 被回复人昵称
      */
@@ -53,8 +53,7 @@ public class Comment implements Serializable {
     /**
      * 被回复人头像
      */
-    @TableField("parent_avater")
-    private String parentAvater;
+    private String parentAvatar;
 
     /**
      * 评论
@@ -77,7 +76,6 @@ public class Comment implements Serializable {
     /**
      * 是否为作者
      */
-    @TableField("author")
     private boolean author;
 
     /**

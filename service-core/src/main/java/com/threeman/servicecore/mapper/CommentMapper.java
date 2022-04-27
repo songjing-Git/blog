@@ -2,7 +2,9 @@ package com.threeman.servicecore.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.threeman.servicecore.entity.Comment;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -15,4 +17,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CommentMapper extends BaseMapper<Comment> {
 
+
+    @Insert("insert into comment values(#{comment.commentId},#{comment.nickName}," +
+            "#{comment.comment},#{comment.blogId},#{comment.parentId},#{comment.parentName}," +
+            "#{comment.supportCount},#{comment.commentDate})")
+    int insertComment(@Param("comment") Comment comment);
 }

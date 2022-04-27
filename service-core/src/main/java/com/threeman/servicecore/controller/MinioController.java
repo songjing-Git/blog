@@ -26,27 +26,21 @@ public class MinioController {
     @Autowired
     MinioClient minioClient;
 
-    @PutMapping("/upload/avater")
+    @PutMapping("/upload/avatar")
     public Object upload(String username,MultipartFile file){
         log.info("username:{}",username);
         log.info("file:{}",file.isEmpty());
         try {
-            PutObjectArgs putAvater = PutObjectArgs.builder()
+            PutObjectArgs putAvatar = PutObjectArgs.builder()
                     .object(username+"-"+file.getOriginalFilename())
-                    .bucket("avater")
+                    .bucket("avatar")
                     .contentType(file.getContentType())
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .build();
-            ObjectWriteResponse objectWriteResponse = minioClient.putObject(putAvater);
+            ObjectWriteResponse objectWriteResponse = minioClient.putObject(putAvatar);
             log.info("etag:{}",objectWriteResponse.etag());
             log.info("versionId:{}",objectWriteResponse.versionId());
-            /*GetPresignedObjectUrlArgs getAvater = GetPresignedObjectUrlArgs.builder()
-                    .bucket("avater").object(username+"-"+file.getOriginalFilename())
-                    .method(Method.GET)
-                    //.expiry(60, TimeUnit.SECONDS)
-                    .build();
-            return minioClient.getPresignedObjectUrl(getAvater);*/
-            return minioConfig.getEndPoint()+"/avater/"+username+"-"+file.getOriginalFilename();
+            return minioConfig.getEndPoint()+"/avatar/"+username+"-"+file.getOriginalFilename();
         }catch (Exception ignored){
             return new CreateException(0,ignored.getMessage());
         }
@@ -58,56 +52,19 @@ public class MinioController {
             throw new CreateException("上传文件不能为空");
         }
         try {
-            PutObjectArgs putAvater = PutObjectArgs.builder()
+            PutObjectArgs putAvatar = PutObjectArgs.builder()
                     .object(file.getOriginalFilename())
                     .bucket("blog-images")
                     .contentType(file.getContentType())
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .build();
-            ObjectWriteResponse objectWriteResponse = minioClient.putObject(putAvater);
+            ObjectWriteResponse objectWriteResponse = minioClient.putObject(putAvatar);
             log.info("etag:{}",objectWriteResponse.etag());
             log.info("versionId:{}",objectWriteResponse.versionId());
-//            GetPresignedObjectUrlArgs getAvater = GetPresignedObjectUrlArgs.builder()
-//                    .bucket("blog-images").object(file.getOriginalFilename())
-//                    .method(Method.GET)
-//                    //.expiry(7, TimeUnit.DAYS)
-//                    .build();
-//            return minioClient.getPresignedObjectUrl(getAvater);
-
             return minioConfig.getEndPoint()+"/blog-images/"+file.getOriginalFilename();
         }catch (Exception ignored){
             return new CreateException(0,ignored.getMessage());
         }
     }
-
-    /*@PutMapping("/upload/blog")
-    public Object upload(int blogId, MultipartFile[] files){
-        ArrayList<String> result=new ArrayList<>();
-        for (MultipartFile file: files){
-            try {
-                PutObjectArgs putAvater = PutObjectArgs.builder()
-                        .object(blogId + "-" + file.getOriginalFilename())
-                        .bucket("avater")
-                        .contentType(file.getContentType())
-                        .stream(file.getInputStream(), file.getSize(), -1)
-                        .build();
-                ObjectWriteResponse objectWriteResponse = minioClient.putObject(putAvater);
-                log.info("etag:{}", objectWriteResponse.etag());
-                log.info("versionId:{}", objectWriteResponse.versionId());
-                GetPresignedObjectUrlArgs getAvater = GetPresignedObjectUrlArgs.builder()
-                        .bucket("avater").object(blogId + "-" + file.getOriginalFilename())
-                        .method(Method.GET)
-                        //.expiry(60, TimeUnit.SECONDS)
-                        .build();
-                String url = minioClient.getPresignedObjectUrl(getAvater);
-                if (!StringUtils.isEmpty(url)){
-                    result.add(url);
-                }
-            }catch (Exception ignored){
-                return new CreateException(0,ignored.getMessage());
-            }
-        }
-        return result;
-    }*/
 
 }

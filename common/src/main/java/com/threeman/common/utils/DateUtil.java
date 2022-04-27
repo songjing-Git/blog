@@ -7,7 +7,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * @author songjing
@@ -74,11 +73,10 @@ public class DateUtil {
     }
 
     public static String getPastTime(String s)  {
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
         Date date;
         try {
-            date = sdf.parse(s);
-        }catch (ParseException e) {
+            date= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(s);
+        } catch (ParseException e) {
             throw new CreateException("时间转化异常");
         }
         long delta = System.currentTimeMillis() - date.getTime();

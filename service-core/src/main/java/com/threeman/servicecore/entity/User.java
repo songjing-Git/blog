@@ -63,8 +63,8 @@ public class User implements Serializable {
     /**
      * 头像
      */
-    @TableField("avater")
-    private String avater;
+    @TableField("avatar")
+    private String avatar;
 
     /**
      * 个人简介
