@@ -5,12 +5,13 @@ spring:
                 reactive:
                     endpoints: 106.13.23.17:9200
     datasource:
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://121.41.59.128:3306/Blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useUnicode=true&useSSL=false
-        username: root
-        password: 7CA3133452d2
         type: com.alibaba.druid.pool.DruidDataSource
         druid:
+            connection-properties: config.decrypt=true;config.decrypt.key=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJvPK6c9dHbq/AZDYO10BfkqRQVBzW/iRN58UrMRTR5JNLwppDeVguFW1BkMRjuQY2pFOV0KdcTqwWlJmMM8ZRUCAwEAAQ==
+            driver-class-name: com.mysql.cj.jdbc.Driver
+            url: jdbc:mysql://121.41.59.128:3306/Blog?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useUnicode=true&useSSL=false
+            username: root
+            password: ZcqKXp+lgCaqKimBFUiYycfWicKHaEZ5B7O+Y84tEWuTtnI9YnU3ney3cchaAEw0b6Uy4AND7QP/5VJQ0g3uIw==
             initial-size: 10
             max-active: 30
             min-idle: 1
@@ -36,7 +37,12 @@ spring:
             filters: stat,wall
             use-global-data-source-stat: true
             #      通过connectProperties属性来打开mergeSql功能；慢SQL记录
-            connect-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+            filter:
+                config:
+                    enabled: true
+                stat:
+                    merge-sql: true
+                    log-slow-sql: true
 
     redis:
         database: 0
