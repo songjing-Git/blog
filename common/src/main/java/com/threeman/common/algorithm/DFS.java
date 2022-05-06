@@ -13,7 +13,7 @@ public class DFS {
      * 将探索过的点存入栈内，遇到走不通的时候将栈顶元素出栈回到上一个元素，实现回溯
      */
 
-    public static void  dfs(char[][] grid, int r, int c) {
+    public static void dfs(char[][] grid, int r, int c) {
         int nr = grid.length;
         int nc = grid[0].length;
 

@@ -11,24 +11,27 @@ public interface ILoginService {
 
     /**
      * 新增用户
+     *
      * @param user 用户信息
      * @return
      */
-    boolean saveLoginInfo(Login user,String email);
+    boolean saveLoginInfo(Login user, String email);
 
     /**
      * 校验用户
+     *
      * @param username 用户名
-     * @param email 邮箱
+     * @param email    邮箱
      * @return
      */
-    boolean verifiesUser(String username,String email);
+    boolean verifiesUser(String username, String email);
 
     /**
      * 更新密码
+     *
      * @param username 用户名
      * @param password 密码
      * @return
      */
-    boolean updatePassword(String username,String password);
+    boolean updatePassword(String username, String password);
 }

@@ -44,25 +44,25 @@ public class Result<T> implements Serializable {
 
 
     public Result(ResultEnum resultEnum) {
-        this.code=resultEnum.getCode();
-        this.message=resultEnum.getMessage();
+        this.code = resultEnum.getCode();
+        this.message = resultEnum.getMessage();
     }
 
     public Result(ResultEnum resultEnum, T data) {
-        this.code=resultEnum.getCode();
-        this.message=resultEnum.getMessage();
-        this.data=data;
+        this.code = resultEnum.getCode();
+        this.message = resultEnum.getMessage();
+        this.data = data;
     }
 
-    public Result( T data) {
-        this.code=ResultEnum.DEFAULT_SUCCESS.getCode();
-        this.message=ResultEnum.DEFAULT_SUCCESS.getMessage();
-        this.data=data;
+    public Result(T data) {
+        this.code = ResultEnum.DEFAULT_SUCCESS.getCode();
+        this.message = ResultEnum.DEFAULT_SUCCESS.getMessage();
+        this.data = data;
     }
 
-    public Result(Integer code,String message){
-        this.code=code;
-        this.message=message;
+    public Result(Integer code, String message) {
+        this.code = code;
+        this.message = message;
     }
 
     @Override
@@ -88,7 +88,6 @@ public class Result<T> implements Serializable {
     public String toString() {
         return JSONObject.toJSONString(this);
     }
-
 
 
 }

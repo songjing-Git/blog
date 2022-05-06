@@ -28,7 +28,7 @@ import java.util.List;
 public class LoginServiceImpl implements ILoginService {
 
 
-    private final int defaultRoleId=10000;
+    private final int defaultRoleId = 10000;
 
     @Autowired
     LoginMapper loginMapper;
@@ -40,46 +40,46 @@ public class LoginServiceImpl implements ILoginService {
     UserRoleMapper userRoleMapper;
 
     @Autowired
-    RedisTemplate<String,Object> redisTemplate;
+    RedisTemplate<String, Object> redisTemplate;
 
-    @Transactional(rollbackFor = Exception.class,propagation = Propagation.REQUIRED)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @Override
-    public boolean saveLoginInfo(Login login,String email) {
-        int i=0;
-        if (loginMapper.insert(login)==1){
+    public boolean saveLoginInfo(Login login, String email) {
+        int i = 0;
+        if (loginMapper.insert(login) == 1) {
             login = loginMapper.findUserInfoByName(login.getUsername());
 
             User user = new User().setUserId(login.getUserId()).setUserName(login.getUsername()).setEmail(email);
-            if (userMapper.insert(user)!=1){
+            if (userMapper.insert(user) != 1) {
                 throw new CreateException("注册用户信息失败");
             }
             List<UserRole> userRoleInfos = userRoleMapper.getUserRoleInfosByUserId(login.getUserId());
-            if (!userRoleInfos.isEmpty()){
+            if (!userRoleInfos.isEmpty()) {
                 userRoleMapper.deleteUserRole(login.getUserId());
             }
             i = userRoleMapper.insertUserRole(login.getUserId(), defaultRoleId);
-        }else {
+        } else {
             throw new CreateException("新增登录用户失败");
         }
-        return i==1;
+        return i == 1;
     }
 
     @Override
     public boolean verifiesUser(String username, String email) {
         log.info("redis缓存查询");
         Object userString = redisTemplate.opsForValue().get(username);
-        if (userString!=null){
+        if (userString != null) {
             User user = JSONObject.parseObject(userString.toString(), User.class);
-            if (user.getEmail().equals(email)){
+            if (user.getEmail().equals(email)) {
                 return true;
             }
         }
         User userInfo = userMapper.getUserInfo(username);
-        if (userInfo==null){
+        if (userInfo == null) {
             throw new CreateException("用户名验证失败");
         }
-        redisTemplate.opsForValue().set(userInfo.getUserName(),userInfo.toString());
-        if (!email.equals(userInfo.getEmail())){
+        redisTemplate.opsForValue().set(userInfo.getUserName(), userInfo.toString());
+        if (!email.equals(userInfo.getEmail())) {
             throw new CreateException("邮箱验证失败");
         }
         return true;
@@ -87,6 +87,6 @@ public class LoginServiceImpl implements ILoginService {
 
     @Override
     public boolean updatePassword(String username, String password) {
-        return loginMapper.updatePassword(username,password);
+        return loginMapper.updatePassword(username, password);
     }
 }

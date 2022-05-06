@@ -24,18 +24,17 @@ import java.util.Map;
 public class JwtUtil {
 
 
-
     private final static String KEY = "singJin3";
 
-    private final static long OUT_TIME =24*60*60*1000;
+    private final static long OUT_TIME = 24 * 60 * 60 * 1000;
 
 
-    public static String getJwtToken(String userId, String username ,String password, List<String> authorities){
+    public static String getJwtToken(String userId, String username, String password, List<String> authorities) {
         Map<String, Object> map = new HashMap<>(16);
         map.put("alg", "HS256");
         map.put("typ", "JWT");
         Date date = new Date();
-        log.info("date:{}",date);
+        log.info("date:{}", date);
         //创建jwt  id jwt标识
         return JWT.create().withJWTId(userId)
                 .withHeader(map)
@@ -47,27 +46,27 @@ public class JwtUtil {
                 .withSubject(username)
                 //载荷
                 .withClaim("authority", authorities)
-                .withClaim("username",username)
-                .withClaim("password",password)
+                .withClaim("username", username)
+                .withClaim("password", password)
                 //标识JWT所颁发的时间
                 .withIssuedAt(date)
                 //标识了时间点，当早于这个时间点，JWT不会被接受和处理
                 .withNotBefore(date)
                 //jwt失效时间
-                .withExpiresAt(new Date(System.currentTimeMillis()+OUT_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + OUT_TIME))
                 //加密方式+盐
                 .sign(Algorithm.HMAC256(KEY));
     }
 
     /**
-     * @description 获取jwt载荷信息
      * @param jwtToken
      * @return
+     * @description 获取jwt载荷信息
      */
-    public static Map<String,Claim> getPayload(String jwtToken){
-        Map<String,Object> map= new HashMap<>(10);
-        if (StringUtils.isEmpty(jwtToken)){
-            throw new CreateException(10000,"jwtToken不能为空");
+    public static Map<String, Claim> getPayload(String jwtToken) {
+        Map<String, Object> map = new HashMap<>(10);
+        if (StringUtils.isEmpty(jwtToken)) {
+            throw new CreateException(10000, "jwtToken不能为空");
         }
         DecodedJWT decode = JWT.decode(jwtToken);
         return decode.getClaims();
@@ -76,22 +75,21 @@ public class JwtUtil {
 
     /**
      * 判断jwt令牌是否失效
+     *
      * @param jwtToken
      * @return
      */
     public static boolean isJwtExpire(String jwtToken) {
         Map<String, Claim> payload = getPayload(jwtToken);
-        if (payload!=null&&!payload.isEmpty()){
+        if (payload != null && !payload.isEmpty()) {
             Date exp = payload.get("exp").asDate();
-            if (exp.before(new Date())){
+            if (exp.before(new Date())) {
                 return true;
             }
             return false;
         }
         return false;
     }
-
-
 
 
 }

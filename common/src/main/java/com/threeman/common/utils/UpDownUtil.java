@@ -12,7 +12,7 @@ import org.springframework.context.support.GenericApplicationContext;
  */
 public class UpDownUtil {
 
-    public static boolean updateFile(){
+    public static boolean updateFile() {
         ApplicationContext applicationContext = new GenericApplicationContext();
         SftpService sftpService = applicationContext.getBean(SftpService.class);
         LinuxOperation linuxOperation = new LinuxOperation();
@@ -26,11 +26,11 @@ public class UpDownUtil {
     }
 
 
-    public static boolean updateFile2(){
+    public static boolean updateFile2() {
         ApplicationContext applicationContext = new GenericApplicationContext();
         SftpService sftpService = applicationContext.getBean(SftpService.class);
         // 公私钥方式
-        LinuxOperation linuxOperation= new LinuxOperation();
+        LinuxOperation linuxOperation = new LinuxOperation();
         linuxOperation.setPort(22);
         linuxOperation.setUser("root");
         linuxOperation.setHost("111.229.221.151");

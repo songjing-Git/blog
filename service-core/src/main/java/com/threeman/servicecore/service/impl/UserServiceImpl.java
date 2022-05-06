@@ -24,13 +24,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public User getUserInfo(String username) {
-        return  userMapper.getUserInfo(username);
+        return userMapper.getUserInfo(username);
     }
 
     @Override
     public boolean updateUserInfo(User user) {
-        QueryWrapper<User> queryWrapper=new QueryWrapper<>();
-        queryWrapper.eq("user_name",user.getUserName());
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_name", user.getUserName());
         return userMapper.update(user, queryWrapper) == 1;
     }
 

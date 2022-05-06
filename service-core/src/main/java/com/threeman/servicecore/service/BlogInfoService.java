@@ -17,11 +17,11 @@ import java.util.Map;
  */
 public interface BlogInfoService extends IService<BlogInfo> {
 
-    boolean insertBlogInfo(Map<String,Object> param);
+    boolean insertBlogInfo(Map<String, Object> param);
 
-    List<Map<String,Object>> findBlogInfos(String text);
+    List<Map<String, Object>> findBlogInfos(String text);
 
-    Map<String, Object> findBlogInfo(long blogId,long userId);
+    Map<String, Object> findBlogInfo(long blogId, long userId);
 
     List<Map<String, Object>> findBlogInfosByPage(String text, int from, int size);
 
@@ -34,8 +34,7 @@ public interface BlogInfoService extends IService<BlogInfo> {
     long addBlogComment(Comment comment);
 
 
-
-    List<Comment> findBlogComment(long blogInfoId,long userId);
+    List<Comment> findBlogComment(long blogInfoId, long userId);
 
     long getBlogSupportCount(long blogId);
 

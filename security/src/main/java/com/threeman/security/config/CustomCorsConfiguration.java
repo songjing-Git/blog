@@ -13,7 +13,7 @@ import org.springframework.web.filter.CorsFilter;
  */
 @Configuration
 public class CustomCorsConfiguration {
-    private CorsConfiguration buildConfig(){
+    private CorsConfiguration buildConfig() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         // 允许任何的head头部
         corsConfiguration.addAllowedHeader("*");

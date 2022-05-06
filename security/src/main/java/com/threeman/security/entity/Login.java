@@ -90,8 +90,9 @@ public class Login implements Serializable, UserDetails {
     public String getUsername() {
         return this.userName;
     }
+
     @Override
-    public String getPassword(){
+    public String getPassword() {
         return this.password;
     }
 

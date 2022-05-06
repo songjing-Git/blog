@@ -21,9 +21,10 @@ public interface RoleAuthorityMapper extends BaseMapper<RoleAuthority> {
 
     /**
      * 根据roleId获取权限列表
+     *
      * @param roleId
      * @return
      */
     @Select("select * from role_authority where role_id = #{roleId}")
-    List<RoleAuthority> getRoleAuthorityInfosByRoleId(@Param("roleId")long roleId);
+    List<RoleAuthority> getRoleAuthorityInfosByRoleId(@Param("roleId") long roleId);
 }

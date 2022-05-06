@@ -18,6 +18,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     /**
      * 根据用户名查询用户信息
+     *
      * @param username
      * @return
      */

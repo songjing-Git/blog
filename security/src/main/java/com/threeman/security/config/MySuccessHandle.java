@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 /**
  * @author songjing
  * @version 1.0
@@ -29,13 +30,13 @@ public class MySuccessHandle implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         List<String> strings = new ArrayList<>();
-        for (GrantedAuthority authority:authorities){
+        for (GrantedAuthority authority : authorities) {
             strings.add(authority.getAuthority());
         }
 
-        Login login  =(Login) authentication.getPrincipal();
-        String jwtToken = JwtUtil.getJwtToken(login.getUserId().toString(),login.getUsername(),login.getPassword(), strings);
-        response.setHeader("token",jwtToken);
+        Login login = (Login) authentication.getPrincipal();
+        String jwtToken = JwtUtil.getJwtToken(login.getUserId().toString(), login.getUsername(), login.getPassword(), strings);
+        response.setHeader("token", jwtToken);
         response.setHeader("Access-Control-Expose-Headers", "token");
         response.setContentType("text/html;charset=utf-8");
         response.getWriter().write(new Result<>(ResultEnum.DEFAULT_SUCCESS).toString());

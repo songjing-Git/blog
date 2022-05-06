@@ -6,7 +6,7 @@ package com.threeman.common.algorithm.ShortestPath;
  * @date 2022/4/11 15:30
  * @描述 弗洛伊德算法
  * 所有顶点间的最短路径
- * @时间复杂度  O(n^3)
+ * @时间复杂度 O(n ^ 3)
  */
 public class Floyd {
     /**

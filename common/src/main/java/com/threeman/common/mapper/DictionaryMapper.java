@@ -22,6 +22,7 @@ public interface DictionaryMapper extends BaseMapper<Dictionary> {
 
     /**
      * 模糊搜索标签
+     *
      * @param typeName 标签名
      * @return
      */

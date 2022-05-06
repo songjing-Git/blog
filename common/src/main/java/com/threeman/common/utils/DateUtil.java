@@ -27,6 +27,7 @@ public class DateUtil {
 
     /**
      * 将java.util.Date 转换为java8 的java.time.LocalDateTime,默认时区为东8区
+     *
      * @param date 日期
      * @return LocalDateTime
      */
@@ -36,6 +37,7 @@ public class DateUtil {
 
     /**
      * 将java8 的 java.time.LocalDateTime 转换为 java.util.Date，默认时区为东8区
+     *
      * @param localDateTime 本地时间
      * @return Date
      */
@@ -72,10 +74,10 @@ public class DateUtil {
         return toMonths(date) / 365L;
     }
 
-    public static String getPastTime(String s)  {
+    public static String getPastTime(String s) {
         Date date;
         try {
-            date= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(s);
+            date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(s);
         } catch (ParseException e) {
             throw new CreateException("时间转化异常");
         }

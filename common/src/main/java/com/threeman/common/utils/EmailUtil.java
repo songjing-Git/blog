@@ -15,12 +15,10 @@ public class EmailUtil {
     /**
      * 发送邮件
      *
-     * @param to
-     *            发送对象（邮箱地址）
-     * @param text
-     *            发送内容
+     * @param to   发送对象（邮箱地址）
+     * @param text 发送内容
      */
-    public static void sendMail(String to, String text) throws  javax.mail.MessagingException {
+    public static void sendMail(String to, String text) throws javax.mail.MessagingException {
         // 创建连接对象 连接到邮件服务器
         Properties properties = new Properties();
 

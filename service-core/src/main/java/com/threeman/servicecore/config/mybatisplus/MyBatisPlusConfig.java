@@ -8,15 +8,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author  songjing
- * @date  2021/11/23 19:17
+ * @author songjing
  * @version 1.0
+ * @date 2021/11/23 19:17
  */
 @Configuration
 public class MyBatisPlusConfig {
 
     /**
      * 插件配置
+     *
      * @return MybatisPlusInterceptor
      */
     @Bean

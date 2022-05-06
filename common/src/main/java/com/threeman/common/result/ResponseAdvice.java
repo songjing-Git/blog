@@ -23,7 +23,8 @@ import java.util.Map;
 @RestControllerAdvice
 public class ResponseAdvice implements ResponseBodyAdvice<Object> {
     /**
-     *  是否支持advice功能
+     * 是否支持advice功能
+     *
      * @param methodParameter
      * @param aClass
      * @return
@@ -35,7 +36,6 @@ public class ResponseAdvice implements ResponseBodyAdvice<Object> {
 
 
     /**
-     *
      * @param body
      * @param methodParameter
      * @param mediaType
@@ -46,34 +46,34 @@ public class ResponseAdvice implements ResponseBodyAdvice<Object> {
      */
     @SneakyThrows
     @Override
-    public Object  beforeBodyWrite(Object body,
-                             MethodParameter methodParameter,
-                             MediaType mediaType,
-                             Class<? extends HttpMessageConverter<?>> aClass,
-                             ServerHttpRequest serverHttpRequest,
-                             ServerHttpResponse serverHttpResponse) {
-        log.info("resultBody:{}",body);
-        if (body instanceof Result){
+    public Object beforeBodyWrite(Object body,
+                                  MethodParameter methodParameter,
+                                  MediaType mediaType,
+                                  Class<? extends HttpMessageConverter<?>> aClass,
+                                  ServerHttpRequest serverHttpRequest,
+                                  ServerHttpResponse serverHttpResponse) {
+        log.info("resultBody:{}", body);
+        if (body instanceof Result) {
             return body;
         }
-        if (body instanceof CreateException){
+        if (body instanceof CreateException) {
             return new Result<>(ResultEnum.DEFAULT_FAILED, ((CreateException) body).getMessage());
         }
-        if (body instanceof String){
+        if (body instanceof String) {
             ObjectMapper om = new ObjectMapper();
-            return om.writeValueAsString( new Result<>(body));
+            return om.writeValueAsString(new Result<>(body));
         }
-        if (body instanceof Map){
+        if (body instanceof Map) {
             Object status = ((Map<?, ?>) body).get("status");
-            if (status==null){
-                return new Result<>(ResultEnum.DEFAULT_SUCCESS,body);
+            if (status == null) {
+                return new Result<>(ResultEnum.DEFAULT_SUCCESS, body);
             }
-            if (200==((int)status)){
+            if (200 == ((int) status)) {
                 Object message = ((Map<?, ?>) body).get("message");
-                return new Result<>(ResultEnum.DEFAULT_SUCCESS,(String)message);
+                return new Result<>(ResultEnum.DEFAULT_SUCCESS, (String) message);
             }
             Object error = ((Map<?, ?>) body).get("error");
-            return new Result<>((int)status,(String)error);
+            return new Result<>((int) status, (String) error);
         }
         return new Result<>(ResultEnum.DEFAULT_SUCCESS, body);
     }

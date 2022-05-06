@@ -27,6 +27,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
     /**
      * 查询所有角色信息
+     *
      * @return List<Role>
      */
     @Override
@@ -36,6 +37,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
     /**
      * 根据roleName查询角色信息
+     *
      * @param roleName 角色名称
      * @return Role
      */

@@ -26,7 +26,6 @@ import java.util.List;
 public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> implements UserRoleService {
 
 
-
     @Autowired
     RoleService roleService;
 
@@ -36,15 +35,15 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
     @Override
     public boolean insertUserRole(long userId, ArrayList<String> roleNames) {
         QueryWrapper<Role> roleQueryWrapper = new QueryWrapper<>();
-        roleQueryWrapper.in("role_name",roleNames);
+        roleQueryWrapper.in("role_name", roleNames);
         List<Role> roles = roleService.list(roleQueryWrapper);
-        if (roles==null){
+        if (roles == null) {
             throw new CreateException("查不到角色信息");
         }
-        int i =0;
-        for (Role role:roles){
-            i=userRoleMapper.insertUserRole(userId, role.getRoleId());
+        int i = 0;
+        for (Role role : roles) {
+            i = userRoleMapper.insertUserRole(userId, role.getRoleId());
         }
-        return i>0;
+        return i > 0;
     }
 }

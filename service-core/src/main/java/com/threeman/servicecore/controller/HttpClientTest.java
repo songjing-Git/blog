@@ -146,22 +146,22 @@ public class HttpClientTest {
      * @param orderId 订单编号
      * @return 将响应结果转换成string返回
      */
-    public static String get(String orderId,String cookie) {
-        String url="http://api.duanshu.com/fairy/manage/v1/orders/"+orderId;
+    public static String get(String orderId, String cookie) {
+        String url = "http://api.duanshu.com/fairy/manage/v1/orders/" + orderId;
         String result = "";
         try {
             // 根据地址获取请求
             HttpGet request = new HttpGet(url);
             // 获取当前客户端对
-            request.setHeader("Cookie",cookie);
+            request.setHeader("Cookie", cookie);
             CloseableHttpClient httpclient = HttpClients.createDefault();
             // 通过请求对象获取响应对象
             HttpResponse response = httpclient.execute(request);
             // 判断请求结果状态码
-            log.info("response:{}",response);
+            log.info("response:{}", response);
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 result = EntityUtils.toString(response.getEntity());
-                log.info("result:{}",result);
+                log.info("result:{}", result);
             }
         } catch (Exception e) {
             e.printStackTrace();

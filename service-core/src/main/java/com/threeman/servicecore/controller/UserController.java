@@ -35,22 +35,23 @@ public class UserController {
 
     /**
      * 注册用户
+     *
      * @param param 入参 username password email
      * @return
      */
     @PutMapping("/register")
-    public Object userRegister(@RequestBody Map<String ,Object> param){
-        if (param==null||param.isEmpty()){
+    public Object userRegister(@RequestBody Map<String, Object> param) {
+        if (param == null || param.isEmpty()) {
             throw new CreateException("参数不能为空");
         }
         String username = param.get("username").toString();
         String password = param.get("password").toString();
         String email = param.get("email").toString();
         boolean matches = email.matches(regexEmail);
-        if (matches){
+        if (matches) {
             throw new CreateException("邮箱格式不正确");
         }
-        if (StringUtils.isEmpty(username)||StringUtils.isEmpty(password)){
+        if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
             throw new CreateException("用户名或密码不能为空");
         }
         Login login = new Login();
@@ -59,45 +60,48 @@ public class UserController {
         login.setCreateTime(DateUtil.localDateTimeConvertToDate(LocalDateTime.now()));
         login.setUpdateTime(DateUtil.localDateTimeConvertToDate(LocalDateTime.now()));
         login.setState(true);
-        log.info("user:{}",login.toString());
-        boolean b ;
+        log.info("user:{}", login.toString());
+        boolean b;
         try {
-            b = loginService.saveLoginInfo(login,email);
-        }catch (Exception ignored){
+            b = loginService.saveLoginInfo(login, email);
+        } catch (Exception ignored) {
             log.info(String.valueOf(ignored));
-            return new Result<>(ResultEnum.DEFAULT_FAILED,"用户名已存在") ;
+            return new Result<>(ResultEnum.DEFAULT_FAILED, "用户名已存在");
         }
         return b;
     }
 
     /**
      * 获取用户信息
+     *
      * @param username
      * @return
      */
     @GetMapping("/getUserInfo/{username}")
-    public User getUserInfo(@PathVariable String username){
-       if (username==null){
-           throw new CreateException("参数不能为空");
-       }
+    public User getUserInfo(@PathVariable String username) {
+        if (username == null) {
+            throw new CreateException("参数不能为空");
+        }
         return userService.getUserInfo(username);
     }
 
     /**
      * 校验用户信息
+     *
      * @param user
      * @return
      */
     @PostMapping("/verifiesUser")
-    public boolean verifiesUser(@RequestBody User user){
-        if (user.getUserName()==null||user.getEmail()==null){
+    public boolean verifiesUser(@RequestBody User user) {
+        if (user.getUserName() == null || user.getEmail() == null) {
             throw new CreateException("参数不能为空");
         }
-        return loginService.verifiesUser(user.getUserName(),user.getEmail());
+        return loginService.verifiesUser(user.getUserName(), user.getEmail());
     }
 
     /**
      * 发送验证码
+     *
      * @param email 邮箱地址
      * @return
      * @throws javax.mail.MessagingException
@@ -106,26 +110,27 @@ public class UserController {
     public Integer sendVerifiesCode(@PathVariable String email) throws javax.mail.MessagingException {
 
         boolean matches = email.matches(regexEmail);
-        if (matches){
+        if (matches) {
             throw new CreateException("邮箱格式不正确");
         }
-        Integer code= (int) (Math.random() * 1000000);
-        EmailUtil.sendMail(email,code.toString());
+        Integer code = (int) (Math.random() * 1000000);
+        EmailUtil.sendMail(email, code.toString());
         return code;
     }
 
     /**
      * 修改登录密码
+     *
      * @param login 登录用户名 密码
      * @return
      */
     @PutMapping("updatePassword")
-    public boolean updatePassword(@RequestBody Login login){
-        return loginService.updatePassword(login.getUsername(),login.getPassword());
+    public boolean updatePassword(@RequestBody Login login) {
+        return loginService.updatePassword(login.getUsername(), login.getPassword());
     }
 
     @PutMapping("updateUserInfo")
-    public boolean updateUserInfo(@RequestBody User user){
+    public boolean updateUserInfo(@RequestBody User user) {
         return userService.updateUserInfo(user);
     }
 }

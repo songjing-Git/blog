@@ -5,16 +5,16 @@ package com.threeman.common.exception;
  * @version 1.0
  * @date 2021/10/27 15:40
  */
-public enum  ExceptionEnum {
+public enum ExceptionEnum {
 
     /**
      * 成功默认枚举
      */
-    DEFAULT_SUCCESS(200,"success"),
+    DEFAULT_SUCCESS(200, "success"),
     /**
      * 失败默认枚举
      */
-    DEFAULT_FAILED(0,"ERROR");
+    DEFAULT_FAILED(0, "ERROR");
     private final Integer code;
 
     private final String message;

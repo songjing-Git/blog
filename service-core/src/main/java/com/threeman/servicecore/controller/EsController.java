@@ -27,41 +27,41 @@ public class EsController {
 
     @SneakyThrows
     @PostMapping("/insertEsModel")
-    public void insertEsModel(){
+    public void insertEsModel() {
         CreateIndexRequest createIndexRequest = new CreateIndexRequest("blog");
-        XContentBuilder mapping= XContentFactory.jsonBuilder();
+        XContentBuilder mapping = XContentFactory.jsonBuilder();
         mapping.startObject().startObject("properties")
 
-                .startObject("blog_info_id").field("type","long").endObject()
+                .startObject("blog_info_id").field("type", "long").endObject()
 
-                .startObject("blog_author_name").field("type","keyword").endObject()
+                .startObject("blog_author_name").field("type", "keyword").endObject()
 
-                .startObject("blog_title").field("type","text").endObject()
+                .startObject("blog_title").field("type", "text").endObject()
                 //摘要
-                .startObject("summary").field("type","text").endObject()
+                .startObject("summary").field("type", "text").endObject()
                 //封面
-                .startObject("image_url").field("type","text").endObject()
+                .startObject("image_url").field("type", "text").endObject()
                 //标签
-                .startObject("tags").field("type","text").endObject()
+                .startObject("tags").field("type", "text").endObject()
 
-                .startObject("create_time").field("type","date").field("format","yyyy-mm-dd HH:mm:ss").endObject()
+                .startObject("create_time").field("type", "date").field("format", "yyyy-mm-dd HH:mm:ss").endObject()
                 //内容
-                .startObject("context").field("type","text").endObject()
+                .startObject("context").field("type", "text").endObject()
                 //阅读量
-                .startObject("views").field("type","long").endObject()
+                .startObject("views").field("type", "long").endObject()
                 //点赞数
-                .startObject("supports").field("type","long").endObject()
+                .startObject("supports").field("type", "long").endObject()
                 //评论数
-                .startObject("comments").field("type","long").endObject()
+                .startObject("comments").field("type", "long").endObject()
                 //发布形式 1-公开 0-私密
-                .startObject("open").field("type","integer").endObject()
+                .startObject("open").field("type", "integer").endObject()
                 //发布时间
-                .startObject("release_time").field("type","date").field("format","yyyy-mm-dd HH:mm:ss").endObject()
+                .startObject("release_time").field("type", "date").field("format", "yyyy-mm-dd HH:mm:ss").endObject()
                 //博文类型 1-html 0-markdown
-                .startObject("blog_type").field("type","integer").endObject()
+                .startObject("blog_type").field("type", "integer").endObject()
                 //1立刻发布 0定时发布
-                .startObject("immediate").field("type","integer").endObject()
-        .endObject().endObject();
+                .startObject("immediate").field("type", "integer").endObject()
+                .endObject().endObject();
         createIndexRequest.mapping(mapping);
         CreateIndexResponse response = restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
 

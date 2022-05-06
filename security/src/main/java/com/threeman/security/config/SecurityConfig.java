@@ -60,7 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     MyFailureHandle myFailureHandle;
 
     @Bean
-    PersistentTokenRepository persistentTokenRepository(){
+    PersistentTokenRepository persistentTokenRepository() {
         JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
         jdbcTokenRepository.setDataSource(dataSource);
         return jdbcTokenRepository;
@@ -75,35 +75,38 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         rememberMeServices.setTokenValiditySeconds(3600 * 24 * 7);
         return rememberMeServices;
     }
+
     @Bean
     public RememberMeAuthenticationFilter rememberMeAuthenticationFilter() throws Exception {
         //重用WebSecurityConfigurerAdapter配置的AuthenticationManager，不然要自己组装AuthenticationManager
         return new RememberMeAuthenticationFilter(authenticationManager(), rememberMeServices());
     }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         List<Authority> authorityInfos = authorityMapper.getAuthorityInfo();
-        if (authorityInfos.isEmpty()){
-            throw  new CreateException(402,"获取权限信息失败");
+        if (authorityInfos.isEmpty()) {
+            throw new CreateException(402, "获取权限信息失败");
         }
         http.authorizeRequests().antMatchers("/login").permitAll();
         http.authorizeRequests().antMatchers("/login").permitAll();
         http.authorizeRequests().antMatchers("/favicon.ico").permitAll();
         http.formLogin().loginProcessingUrl("/login")
-        .successHandler(mySuccessHandle)
-        .failureHandler(myFailureHandle);
+                .successHandler(mySuccessHandle)
+                .failureHandler(myFailureHandle);
         http.rememberMe()
                 .rememberMeParameter("remember_value")
                 .rememberMeCookieName("isRemember")
                 .tokenValiditySeconds(3600)
                 .tokenRepository(persistentTokenRepository());
         http.logout().permitAll();
-        for (Authority authorityInfo:authorityInfos){
+        for (Authority authorityInfo : authorityInfos) {
             http.authorizeRequests().antMatchers(authorityInfo.getAuthorityUrl()).hasAnyAuthority(authorityInfo.getAuthorityCode());
         }
         //http.addFilter(new JwtAuthenticationFilter(authenticationManager()));
@@ -118,9 +121,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors();
         http.headers().addHeaderWriter(new StaticHeadersWriter(Arrays.asList(
                 //支持所有源的访问
-                new Header("Access-control-Allow-Origin","*"),
+                new Header("Access-control-Allow-Origin", "*"),
                 //使ajax请求能够取到header中的jwt token信息
-                new Header("Access-Control-Expose-Headers","token"))));
+                new Header("Access-Control-Expose-Headers", "token"))));
     }
 
     @Bean
@@ -128,8 +131,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("121.41.59.128");
         configuration.addAllowedHeader("*");
-        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT", "DELETE",
-                "HEAD","CONNECT","TRACE","OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE",
+                "HEAD", "CONNECT", "TRACE", "OPTIONS"));
         configuration.addExposedHeader("Authorization");
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -138,19 +141,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
-
-
     @Override
-    public void configure(WebSecurity web)  {
-        web.ignoring().antMatchers("/index.html", "/static/**","/favicon.ico")
-                .antMatchers("/register","/insertEsModel","/verifiesUser","/sendVerifiesCode/*",
-                        "/updatePassword","/addUserRole","/findLabels/*","/insertBlog","/getBlogInfos/*"
-                        ,"/excelReader","/excelReaderByOrderId","/addBlogComment","/delBlogComment/*"
-                        ,"/getBlogInfo/**","/getBlogInfosByPage/*","/addBlogView/*","/blogSupport","/commentSupport"
-                        ,"/blogComment","/findBlogComment/**","/getCommentSupportCount/*","/getBlogSupportCount/*"
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers("/index.html", "/static/**", "/favicon.ico")
+                .antMatchers("/register", "/insertEsModel", "/verifiesUser", "/sendVerifiesCode/*",
+                        "/updatePassword", "/addUserRole", "/findLabels/*", "/insertBlog", "/getBlogInfos/*"
+                        , "/excelReader", "/excelReaderByOrderId", "/addBlogComment", "/delBlogComment/*"
+                        , "/getBlogInfo/**", "/getBlogInfosByPage/*", "/addBlogView/*", "/blogSupport", "/commentSupport"
+                        , "/blogComment", "/findBlogComment/**", "/getCommentSupportCount/*", "/getBlogSupportCount/*"
                 )
                 // 给 swagger 放行 不需要权限能访问的资源
-                .antMatchers("/swagger-ui.html","/doc.html","/null/**",
+                .antMatchers("/swagger-ui.html", "/doc.html", "/null/**",
                         "/swagger-resources/**",
                         "/images/**",
                         "/webjars/**",

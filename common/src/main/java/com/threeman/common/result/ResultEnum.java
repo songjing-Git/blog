@@ -5,21 +5,21 @@ package com.threeman.common.result;
  * @version 1.0
  * @date 2021/10/26 20:09
  */
-public enum  ResultEnum {
+public enum ResultEnum {
 
     /**
      * 成功默认枚举
      */
-    DEFAULT_SUCCESS(200,"SUCCESS"),
+    DEFAULT_SUCCESS(200, "SUCCESS"),
     /**
      * 失败默认枚举
      */
-    DEFAULT_FAILED(0,"ERROR"),
+    DEFAULT_FAILED(0, "ERROR"),
 
     /**
      * token失效
      */
-    TOKEN_EXPIRE(101,"token失效");
+    TOKEN_EXPIRE(101, "token失效");
     private final Integer code;
 
     private final String message;

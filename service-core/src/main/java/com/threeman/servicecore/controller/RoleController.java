@@ -31,23 +31,24 @@ public class RoleController {
 
     /**
      * 给用户添加角色
+     *
      * @return boolean
      */
     @PutMapping("/addUserRole")
-    public boolean insertUserRole(@RequestBody Map<String ,Object> param){
+    public boolean insertUserRole(@RequestBody Map<String, Object> param) {
         String username = param.get("username").toString();
         ArrayList<String> roleNameList = new ArrayList<>();
         Object roleNames = param.get("roleNames");
-        if (roleNames==null||"".equals(roleNames)){
+        if (roleNames == null || "".equals(roleNames)) {
             throw new CreateException("角色信息不能为空");
         }
-        if (roleNames instanceof ArrayList){
+        if (roleNames instanceof ArrayList) {
             roleNameList.addAll((List<String>) roleNames);
         }
         User userInfo = userService.getUserInfo(username);
-        if (userInfo==null){
+        if (userInfo == null) {
             throw new CreateException("查不到用户信息");
         }
-        return userRoleService.insertUserRole(userInfo.getUserId(),roleNameList);
+        return userRoleService.insertUserRole(userInfo.getUserId(), roleNameList);
     }
 }

@@ -20,22 +20,25 @@ public interface LoginMapper extends BaseMapper<Login> {
 
     /**
      * 根据userId查询登录信息信息
+     *
      * @param userId 用户Id
      * @return Login
      */
     @Select("select * from login where user_id = #{userId}")
-    Login findUserInfoById(@Param("userId")long userId);
+    Login findUserInfoById(@Param("userId") long userId);
 
     /**
      * 根据username获取用户信息
+     *
      * @param username 用户名
      * @return login
      */
     @Select("select * from login where user_name = #{username}")
-    Login findUserInfoByName(@Param("username")String username);
+    Login findUserInfoByName(@Param("username") String username);
 
     /**
      * 更新密码
+     *
      * @param username 用户名
      * @param password 密码
      * @return true

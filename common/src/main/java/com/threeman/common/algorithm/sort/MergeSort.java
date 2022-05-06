@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**归并排序
+/**
+ * 归并排序
+ *
  * @author songjing
  * @version 1.0
  * @date 2022/4/7 17:01
@@ -12,13 +14,13 @@ import java.util.List;
 public class MergeSort {
 
     public static void main(String[] args) {
-        List<Integer> list = Arrays.asList(77,22,78,13,41,25,65,48,69,53,17,21);
-        merge(list,0,list.size()-1,new ArrayList<>(16));
+        List<Integer> list = Arrays.asList(77, 22, 78, 13, 41, 25, 65, 48, 69, 53, 17, 21);
+        merge(list, 0, list.size() - 1, new ArrayList<>(16));
 
     }
 
     //归并排序算法
-    private static void merge(List<Integer> list, int start, int end, List<Integer> temp){
+    private static void merge(List<Integer> list, int start, int end, List<Integer> temp) {
         //递归结束条件
         if (start >= end) {
             return;
@@ -40,21 +42,21 @@ public class MergeSort {
         while (f <= mid && s <= end) {
             //将较小的数存入临时数组
             if (list.get(f) < list.get(s)) {
-                temp.add(t++,list.get(f++));
+                temp.add(t++, list.get(f++));
             } else {
-                temp.add(t++,list.get(s++));
+                temp.add(t++, list.get(s++));
             }
         }
         while (f <= mid) {
-            temp.add(t++,list.get(f++));
+            temp.add(t++, list.get(f++));
         }
 
         while (s <= end) {
-            temp.add(t++,list.get(s++));
+            temp.add(t++, list.get(s++));
         }
 
         for (int i = 0, j = start; i < t; i++) {
-            list.set(j++,temp.get(i));
+            list.set(j++, temp.get(i));
         }
         System.out.println(list);
     }

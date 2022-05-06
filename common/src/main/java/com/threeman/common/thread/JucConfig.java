@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class JucConfig {
 
-    public static ThreadPoolExecutor getThreadPoolExecutor(String username){
+    public static ThreadPoolExecutor getThreadPoolExecutor(String username) {
         ThreadFactory build = new ThreadFactoryBuilder().setNameFormat(username).build();
         return new ThreadPoolExecutor(
                 6,

@@ -19,7 +19,7 @@ public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         response.setContentType("application/json;charset=utf-8");
-        response.getWriter().write(String.valueOf(new Result<>(ResultEnum.DEFAULT_FAILED,"访问失败!")));
+        response.getWriter().write(String.valueOf(new Result<>(ResultEnum.DEFAULT_FAILED, "访问失败!")));
 
     }
 }

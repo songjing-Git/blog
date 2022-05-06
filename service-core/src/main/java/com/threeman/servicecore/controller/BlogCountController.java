@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("blogCount")
-public class BlogCountController{
-
-
+public class BlogCountController {
 
 
 }

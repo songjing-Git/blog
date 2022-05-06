@@ -34,16 +34,17 @@ public class FileUtil {
     /**
      * 文件名称
      */
-    private static final String ORIGINAL_FILENAME =null;
+    private static final String ORIGINAL_FILENAME = null;
 
     /**
      * 数据导出
+     *
      * @param list
      */
-    public static void listToFile(List<Object> list,Class clazz,String path,String originalFilename){
-        FileOutputStream fileOutputStream =null;
+    public static void listToFile(List<Object> list, Class clazz, String path, String originalFilename) {
+        FileOutputStream fileOutputStream = null;
         try {
-            fileOutputStream= new FileOutputStream(path+"/"+originalFilename);
+            fileOutputStream = new FileOutputStream(path + "/" + originalFilename);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -52,10 +53,10 @@ public class FileUtil {
         sheet.doWrite(list);
     }
 
-    public static void listToFile(List<Object> list,Class clazz,String originalFilename){
-        FileOutputStream fileOutputStream =null;
+    public static void listToFile(List<Object> list, Class clazz, String originalFilename) {
+        FileOutputStream fileOutputStream = null;
         try {
-            fileOutputStream= new FileOutputStream(PATH+"/"+originalFilename);
+            fileOutputStream = new FileOutputStream(PATH + "/" + originalFilename);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -66,7 +67,7 @@ public class FileUtil {
 
 
     public static void listToFileResponse(List<Object> list, Class clazz,
-                                                         String originalFilename,HttpServletResponse response) throws IOException {
+                                          String originalFilename, HttpServletResponse response) throws IOException {
         response.setContentType("application/vnd.ms-excel");
         response.setCharacterEncoding("utf8");
         response.setHeader("Content-Disposition", "attachment; filename=" + originalFilename);
@@ -80,24 +81,23 @@ public class FileUtil {
         ExcelWriter writer =
                 new ExcelWriter(writeWorkbook);
         WriteSheet writeSheet = new WriteSheet();
-        writer.write(list,writeSheet );
+        writer.write(list, writeSheet);
         writer.finish();
     }
 
     /**
-     *
      * @param multipartFile 读取的文件
-     * @param clazz 目标对象
+     * @param clazz         目标对象
      * @return
      */
-    public static List<Object> fileSyncToObject(MultipartFile multipartFile, Class clazz){
+    public static List<Object> fileSyncToObject(MultipartFile multipartFile, Class clazz) {
         File file = FileUtil.multipartFileToFile(multipartFile);
         ExcelReaderBuilder read = EasyExcel.read(file, clazz, new Listener<>());
         ExcelReaderSheetBuilder sheet = read.sheet();
         return sheet.doReadSync();
     }
 
-    public static List<Object> fileSync(MultipartFile multipartFile){
+    public static List<Object> fileSync(MultipartFile multipartFile) {
         File file = FileUtil.multipartFileToFile(multipartFile);
         ExcelReaderBuilder read = EasyExcel.read(file, new Listener<>());
         ExcelReaderSheetBuilder sheet = read.sheet();
@@ -105,34 +105,33 @@ public class FileUtil {
     }
 
     /**
-     *
      * @param multipartFile 读取的文件
-     * @param clazz 目标对象
+     * @param clazz         目标对象
      */
-    public static void fileToObject(MultipartFile multipartFile, Class clazz){
+    public static void fileToObject(MultipartFile multipartFile, Class clazz) {
         File file = FileUtil.multipartFileToFile(multipartFile);
         ExcelReaderBuilder read = EasyExcel.read(file, clazz, new Listener<>());
         ExcelReaderSheetBuilder sheet = read.sheet();
         sheet.doRead();
     }
 
-    public static File multipartFileToFile(MultipartFile multipartFile){
-        File file =null;
+    public static File multipartFileToFile(MultipartFile multipartFile) {
+        File file = null;
         try {
-            if (multipartFile==null||multipartFile.isEmpty()){
-               throw  new CreateException(11000,"传入文件不能为空");
+            if (multipartFile == null || multipartFile.isEmpty()) {
+                throw new CreateException(11000, "传入文件不能为空");
             }
             InputStream inputStream = multipartFile.getInputStream();
-            log.info("inputStream:{}",inputStream);
+            log.info("inputStream:{}", inputStream);
             String contentType = multipartFile.getContentType();
-            log.info("contentType:{}",contentType);
+            log.info("contentType:{}", contentType);
             String originalFilename = multipartFile.getOriginalFilename();
-            log.info("originalFilename:{}",originalFilename);
+            log.info("originalFilename:{}", originalFilename);
             String name = multipartFile.getName();
-            log.info("name:{}",name);
+            log.info("name:{}", name);
             assert originalFilename != null;
-            file = new File(PATH+"/"+originalFilename);
-            inputStreamToFile(inputStream,file);
+            file = new File(PATH + "/" + originalFilename);
+            inputStreamToFile(inputStream, file);
             inputStream.close();
 
         } catch (IOException e) {
@@ -160,6 +159,7 @@ public class FileUtil {
 
     /**
      * 删除本地临时文件
+     *
      * @param file
      */
     public static boolean deleteTempFile(File file) {

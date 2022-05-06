@@ -13,5 +13,4 @@ import com.threeman.security.entity.RoleAuthority;
 public interface RoleAuthorityService extends IService<RoleAuthority> {
 
 
-
 }

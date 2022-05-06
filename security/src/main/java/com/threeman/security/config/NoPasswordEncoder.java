@@ -12,18 +12,18 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class NoPasswordEncoder  implements PasswordEncoder {
+public class NoPasswordEncoder implements PasswordEncoder {
 
     @Override
     public String encode(CharSequence charSequence) {
-        log.info("charSequence"+charSequence);
+        log.info("charSequence" + charSequence);
         return charSequence.toString();
     }
 
     @Override
     public boolean matches(CharSequence charSequence, String s) {
-        log.info("密码是否匹配:{}",charSequence.equals(s));
-        if (charSequence.equals(s)){
+        log.info("密码是否匹配:{}", charSequence.equals(s));
+        if (charSequence.equals(s)) {
             return true;
         }
         return false;

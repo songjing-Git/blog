@@ -13,17 +13,17 @@ import lombok.extern.slf4j.Slf4j;
 public class Listener<T> extends AnalysisEventListener<T> {
 
     /**
-     *
-     * @param t 每次读取的数据
+     * @param t               每次读取的数据
      * @param analysisContext 上下文
      */
     @Override
     public void invoke(T t, AnalysisContext analysisContext) {
-        log.info("t:{}",t);
+        log.info("t:{}", t);
     }
 
     /**
      * 读取文档完之后调用的方法
+     *
      * @param analysisContext 上下文
      */
     @Override

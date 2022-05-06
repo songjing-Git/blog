@@ -19,14 +19,13 @@ public class RedisCache implements Cache {
 
     private final String id;
 
-    private final RedisTemplate<String,Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public RedisCache(String id, RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
-        log.info("当前的缓存id: [{}]",id);
-        this.id =id ;
+        log.info("当前的缓存id: [{}]", id);
+        this.id = id;
     }
-
 
 
     @Override
@@ -36,8 +35,8 @@ public class RedisCache implements Cache {
 
     @Override
     public void putObject(Object key, Object value) {
-        log.info("放入缓存key:[{}] 放入缓存的value:[{}]",key,value);
-        redisTemplate.opsForValue().set(key.toString(),value);
+        log.info("放入缓存key:[{}] 放入缓存的value:[{}]", key, value);
+        redisTemplate.opsForValue().set(key.toString(), value);
     }
 
     @Override

@@ -27,28 +27,28 @@ public class MinioController {
     MinioClient minioClient;
 
     @PutMapping("/upload/avatar")
-    public Object upload(String username,MultipartFile file){
-        log.info("username:{}",username);
-        log.info("file:{}",file.isEmpty());
+    public Object upload(String username, MultipartFile file) {
+        log.info("username:{}", username);
+        log.info("file:{}", file.isEmpty());
         try {
             PutObjectArgs putAvatar = PutObjectArgs.builder()
-                    .object(username+"-"+file.getOriginalFilename())
+                    .object(username + "-" + file.getOriginalFilename())
                     .bucket("avatar")
                     .contentType(file.getContentType())
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .build();
             ObjectWriteResponse objectWriteResponse = minioClient.putObject(putAvatar);
-            log.info("etag:{}",objectWriteResponse.etag());
-            log.info("versionId:{}",objectWriteResponse.versionId());
-            return minioConfig.getEndPoint()+"/avatar/"+username+"-"+file.getOriginalFilename();
-        }catch (Exception ignored){
-            return new CreateException(0,ignored.getMessage());
+            log.info("etag:{}", objectWriteResponse.etag());
+            log.info("versionId:{}", objectWriteResponse.versionId());
+            return minioConfig.getEndPoint() + "/avatar/" + username + "-" + file.getOriginalFilename();
+        } catch (Exception ignored) {
+            return new CreateException(0, ignored.getMessage());
         }
     }
 
     @PutMapping(value = "/upload/blog")
-    public Object upload(MultipartFile file){
-        if (file==null||file.isEmpty()){
+    public Object upload(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
             throw new CreateException("上传文件不能为空");
         }
         try {
@@ -59,11 +59,11 @@ public class MinioController {
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .build();
             ObjectWriteResponse objectWriteResponse = minioClient.putObject(putAvatar);
-            log.info("etag:{}",objectWriteResponse.etag());
-            log.info("versionId:{}",objectWriteResponse.versionId());
-            return minioConfig.getEndPoint()+"/blog-images/"+file.getOriginalFilename();
-        }catch (Exception ignored){
-            return new CreateException(0,ignored.getMessage());
+            log.info("etag:{}", objectWriteResponse.etag());
+            log.info("versionId:{}", objectWriteResponse.versionId());
+            return minioConfig.getEndPoint() + "/blog-images/" + file.getOriginalFilename();
+        } catch (Exception ignored) {
+            return new CreateException(0, ignored.getMessage());
         }
     }
 

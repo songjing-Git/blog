@@ -8,5 +8,4 @@ package com.threeman.servicecore.config.elasticsearch;
 public class ElasticSearchUtil {
 
 
-
 }

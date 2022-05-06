@@ -21,6 +21,6 @@ public class MyFailureHandle implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         response.setContentType("text/html;charset=utf-8");
-        response.getWriter().write(new Result<>(ResultEnum.DEFAULT_FAILED,exception.getMessage()).toString());
+        response.getWriter().write(new Result<>(ResultEnum.DEFAULT_FAILED, exception.getMessage()).toString());
     }
 }

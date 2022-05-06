@@ -12,6 +12,7 @@ public interface SftpService {
 
     /**
      * 建立通道
+     *
      * @param linuxOperation 连接信息
      */
     void createChannel(LinuxOperation linuxOperation);
@@ -23,17 +24,19 @@ public interface SftpService {
 
     /**
      * 文件上传
+     *
      * @param linuxOperation 连接信息
-     * @param src 路径
-     * @param dst 文件
+     * @param src            路径
+     * @param dst            文件
      * @return boolean
      */
     boolean uploadFile(LinuxOperation linuxOperation, String src, String dst);
 
     /**
      * 删除文件
+     *
      * @param linuxOperation 连接信息
-     * @param dst 文件信息
+     * @param dst            文件信息
      * @return boolean
      */
     boolean removeFile(LinuxOperation linuxOperation, String dst);

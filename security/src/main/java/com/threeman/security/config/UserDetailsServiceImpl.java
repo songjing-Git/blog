@@ -43,11 +43,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
 
-        if (StringUtils.isEmpty(s)){
-            throw  new CreateException(202,"用户名不能为空");
+        if (StringUtils.isEmpty(s)) {
+            throw new CreateException(202, "用户名不能为空");
         }
         Login loginInfo = loginMapper.findUserInfoByName(s);
-        if (loginInfo==null){
+        if (loginInfo == null) {
             throw new CreateException("用户不存在");
         }
         //获取用户userId
@@ -55,14 +55,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         //根据userId获取用户角色关联信息
         List<UserRole> userRoleInfos = userRoleMapper.getUserRoleInfosByUserId(userId);
         //用于登录用户角色存储
-        List<Role> roles=new ArrayList<>();
+        List<Role> roles = new ArrayList<>();
         //用于登录用户权限信息存储
-        List<GrantedAuthority> grantedAuthorities=new ArrayList<>();
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         //遍历对应关系获取权限信息
-        for (UserRole userRole : userRoleInfos){
+        for (UserRole userRole : userRoleInfos) {
             Role role = roleMapper.getRoleInfoByRoleId(userRole.getRoleId());
             List<RoleAuthority> roleAuthorityInfos = roleAuthorityMapper.getRoleAuthorityInfosByRoleId(userRole.getRoleId());
-            for (RoleAuthority roleAuthority: roleAuthorityInfos){
+            for (RoleAuthority roleAuthority : roleAuthorityInfos) {
                 Long authorityId = roleAuthority.getAuthorityId();
                 Authority authorityInfo = authorityMapper.getAuthorityInfoByAuthorityId(authorityId);
                 grantedAuthorities.add(new SimpleGrantedAuthority(authorityInfo.getAuthorityCode()));

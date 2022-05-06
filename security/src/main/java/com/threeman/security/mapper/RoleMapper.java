@@ -22,14 +22,16 @@ public interface RoleMapper extends BaseMapper<Role> {
 
     /**
      * 根据roleId获取角色信息
+     *
      * @param roleId 角色ID
      * @return
      */
     @Select("select * from role where role_id = #{roleId}")
-    Role getRoleInfoByRoleId(@Param("roleId")long roleId);
+    Role getRoleInfoByRoleId(@Param("roleId") long roleId);
 
     /**
      * 查询所有角色信息
+     *
      * @return List<Role>
      */
     @Select("select * from role ")
@@ -37,11 +39,12 @@ public interface RoleMapper extends BaseMapper<Role> {
 
     /**
      * 根据roleName获取角色信息
+     *
      * @param roleName 角色名称
      * @return Role
      */
     @Select("select * from role where role_name = #{roleName}")
-    Role queryRoleInfoByRoleName(@Param("roleName")String roleName);
+    Role queryRoleInfoByRoleName(@Param("roleName") String roleName);
 
     @Select("select * from role where role_name in (#{roleName})")
     List<Role> queryRoleInfosByRoleNames(@Param("roleName") ArrayList<String> roleNames);

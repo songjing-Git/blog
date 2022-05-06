@@ -29,14 +29,15 @@ import java.time.Duration;
  */
 @Configuration
 @EnableCaching //开启注解
-public class RedisConfig  {
+public class RedisConfig {
 
     /**
      * 读写分离
+     *
      * @return LettuceClientConfigurationBuilderCustomizer
      */
     @Bean
-    public LettuceClientConfigurationBuilderCustomizer configurationBuilderCustomizer(){
+    public LettuceClientConfigurationBuilderCustomizer configurationBuilderCustomizer() {
         return configurationBuilderCustomizer ->
                 configurationBuilderCustomizer.readFrom(ReadFrom.REPLICA_PREFERRED);
 

@@ -18,7 +18,7 @@ spring:
             max-wait: 3000
             max-open-prepared-statements: -1
             time-between-eviction-runs-millis: 60000
-                #      配置连接在池中的最小生存时间
+            #      配置连接在池中的最小生存时间
             min-evictable-idle-time-millis: 300000
             #      配置连接在池中的最大生存时间
             max-evictable-idle-time-millis: 400000
@@ -60,8 +60,8 @@ spring:
                 min-idle: 0
 
         #        sentinel:
-#            master: mymaster
-#            nodes: 121.41.59.128:6382,121.41.59.128:6383,121.41.59.128:6384
+        #            master: mymaster
+        #            nodes: 121.41.59.128:6382,121.41.59.128:6383,121.41.59.128:6384
         cluster:
             nodes:
                 - 121.41.59.128:7031

@@ -20,16 +20,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
-    public <T> Result<T> exceptionHandler(HttpServletRequest req, Exception e){
+    public <T> Result<T> exceptionHandler(HttpServletRequest req, Exception e) {
         e.printStackTrace();
-        return new Result<>(e.hashCode(),e.getMessage());
+        return new Result<>(e.hashCode(), e.getMessage());
     }
 
     @ExceptionHandler(value = CreateException.class)
     @ResponseBody
-    public CreateException createExceptionHandler( CreateException e){
+    public CreateException createExceptionHandler(CreateException e) {
         e.printStackTrace();
-        return new CreateException(e.getCode(),e.getMessage());
+        return new CreateException(e.getCode(), e.getMessage());
     }
 
 }

@@ -42,13 +42,13 @@ public class JwtAuthorizationTokenFilter extends BasicAuthenticationFilter {
         logger.info(request.getAuthType());
         logger.info(request.getContextPath());
         String token = request.getHeader("token");
-        if (StringUtils.isEmpty(token)){
+        if (StringUtils.isEmpty(token)) {
             throw new CreateException("认证失败，jwt不能为空");
         }
         SecurityContextHolder.getContext().setAuthentication(getAuthentication(token));
-        if (!JwtUtil.isJwtExpire(token)){
+        if (!JwtUtil.isJwtExpire(token)) {
             SecurityContextHolder.getContext().setAuthentication(getAuthentication(token));
-        }else {
+        } else {
             response.setContentType("text/html;charset=utf-8");
             response.getWriter().write(new Result<>(ResultEnum.TOKEN_EXPIRE).toString());
             return;
@@ -63,27 +63,27 @@ public class JwtAuthorizationTokenFilter extends BasicAuthenticationFilter {
         logger.info("UsernamePasswordAuthenticationToken");
         Map<String, Claim> payload = JwtUtil.getPayload(token);
         String username = payload.get("username").asString();
-        logger.info("username:"+username);
-        if (StringUtils.isEmpty(username)){
+        logger.info("username:" + username);
+        if (StringUtils.isEmpty(username)) {
             throw new CreateException("username获取异常");
         }
         String password = payload.get("password").asString();
-        if (StringUtils.isEmpty(password)){
+        if (StringUtils.isEmpty(password)) {
             throw new CreateException("token获取异常");
         }
         Claim authority = payload.get("authority");
-        if (authority.isNull()){
+        if (authority.isNull()) {
             throw new CreateException("token权限获取异常");
         }
         List<String> s = authority.asList(String.class);
         logger.info(s);
-        if (s.isEmpty()){
+        if (s.isEmpty()) {
             throw new CreateException("token解析异常");
         }
         List<SimpleGrantedAuthority> simpleGrantedAuthorities = new ArrayList<>();
-        for (String s1:s){
+        for (String s1 : s) {
             simpleGrantedAuthorities.add(new SimpleGrantedAuthority(s1));
         }
-        return new UsernamePasswordAuthenticationToken(username,password,simpleGrantedAuthorities);
+        return new UsernamePasswordAuthenticationToken(username, password, simpleGrantedAuthorities);
     }
 }

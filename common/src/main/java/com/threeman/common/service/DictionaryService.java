@@ -17,6 +17,7 @@ public interface DictionaryService extends IService<Dictionary> {
 
     /**
      * 模糊搜索标签
+     *
      * @param typeName 名称
      * @return List<Dictionary>
      */
