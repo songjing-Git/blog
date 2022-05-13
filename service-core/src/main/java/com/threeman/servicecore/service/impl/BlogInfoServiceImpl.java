@@ -502,7 +502,8 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
     @Override
     @Transactional(rollbackFor = Exception.class)
     public long addBlogComment(Comment comment) {
-        comment.setCommentId(IdWorker.getId());
+        log.info("comment:{}",comment);
+        comment.setCommentId(String.valueOf(IdWorker.getId()));
         BlogInfo blogInfo = blogInfoMapper.selectById(comment.getBlogId());
         if (blogInfo == null) {
             throw new CreateException("该博文不存在");
@@ -521,7 +522,7 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
         String format = dateFormat.format(date);
-        log.info("date:{}", format);
+
         comment.setCommentDate(format);
         ThreadPoolExecutor threadPoolExecutor = JucConfig.getThreadPoolExecutor(comment.getNickName());
         threadPoolExecutor.execute(() -> {
@@ -532,7 +533,7 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         });
         User userInfo = userMapper.getUserInfo(comment.getNickName());
         comment.setNickAvatar(userInfo.getAvatar());
-        if (comment.getParentName()!=null){
+        if (!StringUtils.isEmpty(comment.getParentName())){
             User parentInfo = userMapper.getUserInfo(comment.getParentName());
             comment.setParentAvatar(parentInfo.getAvatar());
         }
@@ -552,44 +553,40 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
         String blogId = String.valueOf(blogInfoId);
         List<Object> ranges = redisTemplate.opsForList().range(blogId, 0, -1);
         List<Comment> commentList = new ArrayList<>();
+        log.info("ranges:{}",ranges);
         if (ranges != null) {
             for (Object comment : ranges) {
                 commentList.add((Comment) comment);
             }
         }
-        List<Comment> comments = getComments(commentList, 0);
+        List<Comment> comments = getComments(commentList, "");
+        /*if (comments.size()==0){
+            return null;
+        }*/
         return findParent(comments, userId);
     }
-
-    @Override
-    public long getBlogSupportCount(long blogId) {
-        Long size = redisTemplate.opsForSet().size("blogSupport_" + blogId);
-        return size == null ? 0 : size;
-    }
-
-    @Override
-    public long getCommentSupportCount(long blogId) {
-        Long size = redisTemplate.opsForSet().size("commentSupport_" + blogId);
-        return size == null ? 0 : size;
-    }
-
-
-    private List<Comment> getComments(List<Comment> commentList, long pid) {
+    private List<Comment> getComments(List<Comment> commentList, String pid) {
         if (commentList == null) {
             return null;
         }
         List<Comment> treeList = new ArrayList<>();
         for (Comment comment : commentList) {
-            if (pid == comment.getParentId()) {
+            /*log.info("comment.getParentId():{}",comment.getParentId());
+            if (StringUtils.isEmpty(comment.getParentId())){
+                treeList.add(comment);
+                continue;
+            }*/
+            log.info("comment.getParentId():{}",comment.getParentId());
+            log.info("pid:{}",pid);
+            log.info("equals:{}",pid.equals(comment.getParentId()));
+            if (pid.equals(comment.getParentId()) ) {
                 comment.setChildren(getComments(commentList, comment.getCommentId()));
                 treeList.add(comment);
             }
         }
         return treeList;
     }
-
     private List<Comment> findParent(List<Comment> comments, long userId) {
-
         for (Comment comment : comments) {
 
             // 防止checkForComodification(),而建立一个新集合
@@ -603,7 +600,6 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
             Boolean member = redisTemplate.opsForSet().isMember("commentSupport_" + comment.getCommentId(), "user_" + userId);
             comment.setSupport(member != null);
             String commentDate = comment.getCommentDate();
-            log.info("commentDate:{}", commentDate);
             comment.setCommentDate(DateUtil.getPastTime(commentDate));
         }
         return comments;
@@ -614,7 +610,9 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
 
         // 找出直接子级
         List<Comment> comments = parent.getChildren();
-
+        /*if (comments==null){
+            return;
+        }*/
         // 遍历直接子级的子级
         for (Comment comment : comments) {
 
@@ -633,5 +631,24 @@ public class BlogInfoServiceImpl extends ServiceImpl<BlogInfoMapper, BlogInfo> i
             comment.setChildren(new ArrayList<>());
         }
     }
+
+
+
+    @Override
+    public long getBlogSupportCount(long blogId) {
+        Long size = redisTemplate.opsForSet().size("blogSupport_" + blogId);
+        return size == null ? 0 : size;
+    }
+
+    @Override
+    public long getCommentSupportCount(long blogId) {
+        Long size = redisTemplate.opsForSet().size("commentSupport_" + blogId);
+        return size == null ? 0 : size;
+    }
+
+
+
+
+
 
 }

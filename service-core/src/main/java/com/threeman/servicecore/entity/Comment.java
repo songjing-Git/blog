@@ -32,7 +32,7 @@ public class Comment implements Serializable {
      * 评论Id
      */
     @TableId
-    private Long commentId;
+    private String commentId;
 
     /**
      * 回复人昵称
@@ -71,7 +71,7 @@ public class Comment implements Serializable {
      * 回复评论Id
      */
     @TableField("parent_id")
-    private Long parentId;
+    private String parentId;
 
     /**
      * 是否为作者
