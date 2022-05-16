@@ -4,6 +4,13 @@ spring:
             client:
                 reactive:
                     endpoints: 106.13.23.17:9200
+    rabbitmq:
+        host: 124.221.132.136
+        username: songjing
+        password: songjing
+        port: 5672
+        virtual-host: /
+
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         druid:

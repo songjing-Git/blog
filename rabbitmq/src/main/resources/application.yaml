@@ -1,5 +1,0 @@
-spring:
-    rabbitmq:
-        host: 124.221.132.136
-        username: songjing
-        password: songjing
